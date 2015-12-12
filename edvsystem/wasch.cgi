@@ -23,7 +23,7 @@ our $admin = 7; # Status: Kassenwart
 our $waschag = 5; # Status: WaschAG-Mitglied
 our $exWaschag = 3; # Status: ehemaliges WaschAG-Mitglied
 our $user = 1; # Status: User
-our $wartung = 0; # 1 sperrt das gesamte System für alle User außer WaschAG + Admin
+our $wartung = 0; # 1 sperrt das gesamte System fÃ¼r alle User auÃŸer WaschAG + Admin
 our $godWartung = 0; # 1 sperrt das gesamte System für alle User außer Admin
 our $superuser = "137.226.143.79";
 our $tvkurt = "137.226.143.4"; #TvKurt Adresse
@@ -36,7 +36,7 @@ our $termPerDay;
 our $termPerMonth;
 our $freiGeld;
 our $anzahlMaschinen;
-our $error = ''; # temporäre Variable für diverse Fehlermeldungen
+our $error = ''; # temporÃ¤re Variable für diverse Fehlermeldungen
 our $terminhash = ''; # ist der has des users für den ical-export
 
 # Öffnen der Datenbank
@@ -51,7 +51,7 @@ our $terminhash = ''; # ist der has des users für den ical-export
 my $dbh;
 my $cfg = Config::IniFiles->new( -file => "./inc/config.ini" );
 #$dbh = DBI->connect($cfg->val("wasch","db"),$cfg->val("wasch","user"),$cfg->val("wasch","pw")) or die $dbh->errstr();
-$dbh = DBI->connect($cfg->val("wasch","db"),$cfg->val("wasch","user"),$cfg->val("wasch","pw")) or die $DBI::errstr;
+$dbh = DBI->connect($cfg->val("wasch","db"),$cfg->val("wasch","user")) or die $DBI::errstr;
 
 
 # Start HTML
@@ -354,10 +354,11 @@ sub validate {
 		}
 		if (substr($ip,0,3) eq "10.")
 		{
-			my $time = $row[4];
-			benachrichtige($row[3], "Login vom TürmeRoam aus am $time");
-			return(1);	
+		       my $time = $row[4];
+		       benachrichtige($row[3], "Login vom TuermeRoam aus am $time");
+		       return(1);
 		}
+
 			#Workaround for high level no ip check
 			#if($row[2] > 4){
 			#	return(1);
@@ -666,7 +667,7 @@ sub benachrichtige {
 # Kopf jeder Seite, implementiert das Design der Netz-AG
 sub print_header {
      print "Content-type: text/html\n\n";
-     open (START, " /var/www/www.tvk.rwth-aachen.de/start.inc");
+     open (START, " /var/www/start.inc");
           my @file = <START>;
           print @file;
      close (START);
@@ -678,13 +679,13 @@ sub print_header {
 		 print "</style>";
 }
 
-# Fuß jeder Seite, Gegenstück zu print_header
+# Fu  jeder Seite, GegenstÃ¼ck zu print_header
 sub print_footer {
 	print "<br><br><br><table width=\"100%\" frame=\"above\" cellpadding=\"1\">";
 	print "<tr><td align=\"left\"> $progName $version</td><td align=\"right\">by $godsName </td></tr>";
 	print "<tr><td colspan=2><b>(1)</b> Sollte eine diese Zeitangaben mehr als 5 Minuten abweichen, das System <b>nicht</b> benutzen und <b>sofort</b> der WaschAG melden! </td></tr>";
 	print "<tr><td colspan=2><b>(2)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
-     open (ENDE, "/var/www/localhost/htdocs/start.inc");
+     open (ENDE, "/var/www/start.inc");
           my @file = <ENDE>;
           print @file;
      close (ENDE);
@@ -706,7 +707,7 @@ sub Titel {
 			$bestand = $row[0];
 			$bonus = $row[1];
 		}
-		print "<tr><td colspan=\"2\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus (2)) Euro</b> .</td></tr>";
+		print "<tr><td colspan=\"2\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(2)</sup>.</td></tr>";
 	}
 	$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
