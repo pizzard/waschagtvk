@@ -1,0 +1,174 @@
+<!--#include virtual="/start.inc" -->
+
+<H1><img src="/ico/apps/drop.png"> Die Wasch-AG des TvK</h1>
+
+<table border="0" width="100%" >
+
+
+
+<p align="center">
+	<img src="waschmaschinen.jpg" border=0 alt="" usemap="#Maschine">
+
+	<map name="Maschine">
+
+	<area shape="circle" coords="95,160,40" alt="Sperrzone" href="./Sperrzone/Sperrzone.shtml" alt="Sperrzone" title="Mitgliederbereich">
+
+	<area shape="circle" coords="364,,229,40" alt="Ente" href="ente.shtml" alt="Ente" title="Ente">
+
+</map>
+
+</p>
+
+                <br>
+
+
+
+<p align="justify">
+
+Im Keller des TvK's befinden sich drei Waschmaschinen und drei dazugeh&ouml;rige Trockner,
+die f&uuml;r 1&euro; pro Waschgang benutzt werden k&ouml;nnen. Dabei ist die Trocknerbenutzung gratis.
+Die Trockner d&uuml;rft ihr allerdings nur benutzen, wenn ihr vorher auch die Waschmaschinen benutzt. Dies muss leider sein,
+um jedem Benutzer einen, zum Waschtermin zugeh&ouml;rigen, Trocknertermin garantieren zu k&ouml;nnen.
+Um Waschen zu k&ouml;nnen, ist es notwendig dass ihr euch bei einem Wasch-AG Mitglied anmeldet.
+Dort erhaltet ihr dann ein pers&ouml;nliches Benutzerkonto. Termine k&ouml;nnt ihr nach Einloggen <a href="edvsystem/wasch.cgi">hier</a> (oder oben) buchen.
+Zu eurem Termin m&uuml;sst ihr euch euren Loginnamen und euer Passwort merken und es an Waschbaer eingeben, um die Waschmaschinen einschalten zu k&ouml;nnen.
+Waschpulver m&uuml;sst ihr selbst mitbringen und bitte lest euch vor Benutzung der Maschinen auch
+die Satzung der Wasch-AG und die Nutzungsregeln durch. Wer Fragen dazu hat, kann uns gerne ansprechen.</p>
+
+
+					<p align="right">Eure Wasch-AG</p>
+
+
+
+
+
+
+
+<br>
+<p align="center">
+<a href="edvsystem/wasch.cgi">
+<b>Login <img src="baer.jpg" width=80> WaschZoo</b></a>
+</p>
+<p align="left"><a href="Regeln20101208.pdf">Regeln</a> / <a href="Waschregeln20100531englisch.pdf"> Rules</a></p>
+<p align="left"><a href="edvsystem/doku.cgi?lang=ger">Dokumentation</a> / <a href="edvsystem/doku.cgi?lang=eng">documentation</a></p>
+<p align="left"></p>
+
+<p align="left"><a href="Satzung20101208.pdf">Satzung</a></p>
+
+<p align="justify">
+Wenn Probleme beim Waschen oder beim Trocknen auftreten, die bei &bdquo;Hinweise zu den Maschinen&rdquo; nicht aufgelistet sind und ihr keinen von uns direkt pers&ouml;nlich antrefft, dann schreibt uns bitte <span style="font-weight:bold">sofort</span> eine E-Mail mit folgenden Angaben:
+<ul>
+  <li>Benutzte Maschine</li>
+  <li>Ausgew&auml;hltes Programm</li>
+  <li>Beginn eures Termins</li>
+  <li>Genaue Fehlerbeschreibung</li>
+</ul>
+
+
+
+<br>
+<h4 align="left">Hinweise zu den Maschinen / Information on our machines</a></h4>
+<p align="left"><div align="left" style="color:black">(letzte &Auml;nderung / Last change 
+14.03.2012)</div></p>
+
+
+<p align="justify"><div style="color:red">Fehlschl&auml;ge beim Waschen oder Trocknen, die mit hier aufgef&uuml;hrten L&ouml;sungen h&auml;tten vermieden werden k&ouml;nnen, fallen nicht unter die Kulanz!</div></p>
+
+<br>
+  <table border=1 width=100%>
+
+<!-- Waschmaschine Nr. 4 -->
+<tr>
+    <td style='white-space:nowrap'>Waschmaschine 1 </td>
+    <td>
+    	<ul>
+         	<li>Erst einloggen, dann beladen!</li>
+         	<li>Wenn "W&auml;sche entnehmen" angezeigt wird, Schalter auf "Ende" stellen und ggf. T&uuml;re schlie&szlig;en und &ouml;ffnen!</li>
+         	
+		</ul>
+    </td>
+</tr>
+
+
+<!-- Waschmaschine Nr. 2 -->
+<tr>
+    <td>Waschmaschine 2 </td>
+    <td>
+         <ul>
+	<li> Solange die Maschinent&uuml;r ge&ouml;ffnet ist, zeigt die Maschine gar nichts an, das ist 
+normal und sie ist trotzdem an!</li>
+	<li> Das Display ist kaputt, die Maschine w&auml;scht jedoch trotzdem einwandfrei und 
+die kleine  Leuchte unter dem Display zeigt bei geschlossener T&uuml;r an, ob die Maschine waschbereit 
+ist! </li>
+         <li>Es kann (vor allem zu Beginn des Waschgangs) passieren, dass die Maschine im Waschgang 
+f&uuml;r mehrere Minuten 
+stehen bleibt/kein Wasser mehr zieht - das ist kein Grund zur Sorge, der Waschgang wird fortgesetzt!</li>
+         </ul>
+    </td>
+</tr>
+
+
+<!-- Waschmaschine Nr. 3 -->
+<tr>
+    <td>Waschmaschine 3 </td>
+     <td>
+    	<ul>
+          
+	<li> Bitte nicht ohne Schleudern benutzen, dann pumpt die Maschine eventuell nicht richtig ab. 
+</li>          
+	</ul>
+    </td>
+</tr>
+
+
+<!-- Waschmaschine Nr. X -->
+<!--<tr>
+    <td>Waschmaschine X </td>
+     <td>
+    	<ul>
+          
+	</ul>
+    </td>
+</tr>-->
+
+
+
+<tr>
+    <td> Trockner 1 </td>
+    <td>
+        <ul>
+        <li> - </li>
+        </ul>
+    </td>
+</tr>
+
+
+<tr>
+    <td> Trockner 2 </td>
+    <td>
+        <ul>
+        <li> -</li>
+        </ul>
+    </td>
+</tr>
+
+
+
+<tr>
+    <td> Trockner 3 </td>
+    <td>
+        <ul>
+        <li> -  </li>
+        </ul>
+    </td>
+</tr>
+
+</table>
+
+<br>
+
+<HR>
+
+<p align="left"><EM>21.01.2011</EM>  <img  src="/mailpic.cgi?dom=tvk.rwth-aachen.de&loc=wasch-ag&color=000000&size=Large"  style="position:relative; top:5px; left:3px"></p>
+
+<!--#include virtual="/ende.inc" -->
