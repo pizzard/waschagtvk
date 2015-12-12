@@ -363,7 +363,7 @@ sub validate {
 			#if($row[2] > 4){
 			#	return(1);
 			#}
-		$error = "IP stimmt nicht. Bitte vom eigenen Rechner oder TvKurt einloggen!";
+		$error = "IP $ip stimmt nicht. Bitte vom eigenen Rechner oder TvKurt einloggen!";
 		return (0);
 	} else {
 		$error = "Passwort falsch!";
