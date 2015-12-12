@@ -352,6 +352,12 @@ sub validate {
 			benachrichtige($row[3], "Login vom TvKurt aus am $time");
 			return(1);
 		}
+		if (substr($ip,0,3) eq "10.")
+		{
+			my $time = $row[4];
+			benachrichtige($row[3], "Login vom TürmeRoam aus am $time");
+			return(1);	
+		}
 			#Workaround for high level no ip check
 			#if($row[2] > 4){
 			#	return(1);
