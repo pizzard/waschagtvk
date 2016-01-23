@@ -953,7 +953,7 @@ sub firstLogin {
 		if($row[0] >= $waschag && $row[1] == 0) {
 				$sth = $dbh->prepare("UPDATE users SET gotfreimarken='1' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
 				$sth->execute();
-				geldbewegung($row[2], $freiGeld, encode("utf-8", "monatliches Freigeld f&uuml;r WaschAG-Mitglieder"));
+				geldbewegung($row[2], 0, encode("utf-8", "monatliches Freigeld f&uuml;r WaschAG-Mitglieder"), $freiGeld);
 				benachrichtige($row[2], "Du hast dein monatliches Freigeld f&uuml;r WaschAG-Mitglieder erhalten.");
 		}
 		$sth = $dbh->prepare("UPDATE users SET lastlogin='$jetzt' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
