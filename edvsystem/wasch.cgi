@@ -1943,18 +1943,14 @@ sub statistik {
 		$sth2->execute();
 		@row2 = $sth2->fetchrow_array();
 		$etagenGeld[$temp] += $row2[0];
+		$finanzSumme += $row2[0];
 	}
 
 	# Geld bei den Nutzern und der AG
 	$sth = $dbh->prepare("SELECT id FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
-	$finanzSumme = 0;
 	$waschFinanz = 0;
 	while (@row = $sth->fetchrow_array()) {
-		$sth2 = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user=$row[0] ORDER BY datum DESC LIMIT 1")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-		$sth2->execute();
-		@row2 = $sth2->fetchrow_array();
-		$finanzSumme += $row2[0];
 		$sth2 = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$row[0] ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 		$sth2->execute();
 		@row2 = $sth2->fetchrow_array();
