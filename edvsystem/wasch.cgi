@@ -683,8 +683,7 @@ sub print_header {
 sub print_footer {
 	print "<br><br><br><table width=\"100%\" frame=\"above\" cellpadding=\"1\">";
 	print "<tr><td align=\"left\"> $progName $version</td><td align=\"right\">by $godsName </td></tr>";
-	print "<tr><td colspan=2><b>(1)</b> Sollte eine diese Zeitangaben mehr als 5 Minuten abweichen, das System <b>nicht</b> benutzen und <b>sofort</b> der WaschAG melden! </td></tr>";
-	print "<tr><td colspan=2><b>(2)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
+	print "<tr><td colspan=2><b>(1)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
      open (ENDE, "/var/www/start.inc");
           my @file = <ENDE>;
           print @file;
@@ -707,22 +706,8 @@ sub Titel {
 			$bestand = $row[0];
 			$bonus = $row[1];
 		}
-		print "<tr><td colspan=\"2\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(2)</sup>.</td></tr>";
+		print "<tr><td colspan=\"2\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(1)</sup>.</td></tr>";
 	}
-	$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	$sth->execute();
-	@row = $sth->fetchrow_array();
-	 ($second, $minute, $hour, $day, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
-	$year = 1900 + $yearOffset;
-	$month++;
-	if($month <10){ $month = "0$month";}
-	if($day <10){ $day = "0$day";}
-	if($second <10) {$second = "0$second";}
-	if($hour <10){ $hour = "0$hour";}
-	if($minute <10){ $minute = "0$minute";}
-	$theTime = "$year-$month-$day $hour:$minute:$second";
-	#print "<tr style=\"font-size: 0.8em\"><td>Datenbankzeit: </td><td> ".$row[0]." Uhr</td><td>&nbsp;</td><td>aktuelle Serverzeit: </td><td>$theTime Uhr<b>(1)</b></td></tr></table>";
-	print "<table style=\"font-size: 0.8em\"><tr><td>Datenbankzeit: </td><td> ".$row[0]." Uhr</td><td></td></tr><tr><td>aktuelle Serverzeit: </td><td>$theTime Uhr <b> (1)</b></td></tr></table>"
 }
 
 # Universalfunktion zum Validieren der Logindaten, überprüfen der Zugriffsrechte, setzen des Titels und Erstellen der Menüleisten
