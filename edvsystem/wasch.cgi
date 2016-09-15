@@ -25,7 +25,7 @@ our $exWaschag = 3; # Status: ehemaliges WaschAG-Mitglied
 our $user = 1; # Status: User
 our $wartung = 0; # 1 sperrt das gesamte System fÃ¼r alle User auÃŸer WaschAG + Admin
 our $godWartung = 0; # 1 sperrt das gesamte System für alle User außer Admin
-our $superuser = "137.226.143.79";
+our $superuser = "137.226.143.7";
 our $tvkurt = "137.226.143.4"; #TvKurt Adresse
 our $maxBetrag = 100; #Betrag, den ein User maximal einzahlen darf
 our $stornTime;
