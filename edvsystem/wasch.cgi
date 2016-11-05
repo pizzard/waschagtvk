@@ -23,9 +23,9 @@ our $admin = 7; # Status: Kassenwart
 our $waschag = 5; # Status: WaschAG-Mitglied
 our $exWaschag = 3; # Status: ehemaliges WaschAG-Mitglied
 our $user = 1; # Status: User
-our $wartung = 0; # 1 sperrt das gesamte System fÃ¼r alle User auÃŸer WaschAG + Admin
-our $godWartung = 0; # 1 sperrt das gesamte System für alle User außer Admin
-our $superuser = "137.226.143.79";
+our $wartung = 0; # 1 sperrt das gesamte System fÃƒÂ¼r alle User auÃƒÅ¸er WaschAG + Admin
+our $godWartung = 0; # 1 sperrt das gesamte System fÃ¼r alle User auÃŸer Admin
+our $superuser = "137.226.143.7";
 our $tvkurt = "137.226.143.4"; #TvKurt Adresse
 our $maxBetrag = 100; #Betrag, den ein User maximal einzahlen darf
 our $stornTime;
@@ -36,10 +36,10 @@ our $termPerDay;
 our $termPerMonth;
 our $freiGeld;
 our $anzahlMaschinen;
-our $error = ''; # temporÃ¤re Variable für diverse Fehlermeldungen
-our $terminhash = ''; # ist der has des users für den ical-export
+our $error = ''; # temporÃƒÂ¤re Variable fÃ¼r diverse Fehlermeldungen
+our $terminhash = ''; # ist der has des users fÃ¼r den ical-export
 
-# Öffnen der Datenbank
+# Ã–ffnen der Datenbank
 #		my $X;
 #    open( DBINI, "< ".$include."config.ini" );
 #    while ( chomp( $X = <DBINI> ) ) { push( @DBINI, $X ); }
@@ -225,7 +225,7 @@ if ($cgi->url_param('aktion') eq 'create_user') {
 print_footer();		# und der html-ausgabe-teil beendet.
 
 
-# ----- HIER BEGINNT DER ABSCHNITT DER HILFSFUNKTIONEN ENTHÄLT -----
+# ----- HIER BEGINNT DER ABSCHNITT DER HILFSFUNKTIONEN ENTHÃ„LT -----
 
 # Berechnet, die Distanz zwischen jetzt und Anfang Waschtermin
 sub wieLangNoch {
@@ -238,7 +238,7 @@ sub wieLangNoch {
 	return ($row[0]);
 }
 
-# entfernt böse Zeichen ausm String ;)
+# entfernt bÃ¶se Zeichen ausm String ;)
 sub makeclean {
 	my $text = shift;
 	$text =~ s/"//g;
@@ -247,7 +247,7 @@ sub makeclean {
 	return ($text);
 }
 
-# Berechnet, wie lange der Termin schon läuft
+# Berechnet, wie lange der Termin schon lÃ¤uft
 sub wieLangSchon {
 	my $waschzeit = shift;
 	my $zeit;
@@ -291,7 +291,7 @@ sub getConfig {
 	$anzahlMaschinen = $row[0];
 }
 
-# prüft ein Passwort auf Sicherheit
+# prÃ¼ft ein Passwort auf Sicherheit
 # param pw
 sub checkPW {
 	my $pw = shift;
@@ -371,7 +371,7 @@ sub validate {
 	}
 }
 
-# Überprüft, ob der Loginname gültig ist
+# ÃœberprÃ¼ft, ob der Loginname gÃ¼ltig ist
 sub checkLogin {
 	my $loginToProof = shift;
 	if ($loginToProof =~ m/[^0-9a-zA-Z]/){
@@ -382,7 +382,7 @@ sub checkLogin {
 	}
 }
 
-# Zählt, wie oft ein Loginname in der DB vorliegt
+# ZÃ¤hlt, wie oft ein Loginname in der DB vorliegt
 sub countLogin {
 	my $loginToProof = vorbereiten(shift);
 	my $sth = $dbh->prepare("SELECT * FROM users WHERE login = $loginToProof")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
@@ -438,7 +438,7 @@ sub gibWaschTerminTechnisch {
 	}
 }
 
-# Setzt die Cookies, die fürs Validieren wichtig sind (Passwort und Login)
+# Setzt die Cookies, die fÃ¼rs Validieren wichtig sind (Passwort und Login)
 sub setCookies {
 	my $login = shift;
 	my $pw = shift;
@@ -453,7 +453,7 @@ sub setCookies {
 	print $cgi->redirect(-URL=>"$skript?aktion=index&del=no", -cookie=>[$cLogin, $cPw]);
 }
 
-# gibt das aktuelle Datum + n Tage (als Parameter) im richtigen Format für MySQL zurück
+# gibt das aktuelle Datum + n Tage (als Parameter) im richtigen Format fÃ¼r MySQL zurÃ¼ck
 sub gibDatumString {
 	my $n = shift;
 	my @zeit = gibDatum($n);
@@ -529,7 +529,7 @@ sub gibZeit {
 	return (@zeit);
 }
 
-# bestimmt den Wochentag von localtime + n Tage (als Parameter) und gibt seine Nummer zurück (Mo = 0 bis 6 = So)
+# bestimmt den Wochentag von localtime + n Tage (als Parameter) und gibt seine Nummer zurÃ¼ck (Mo = 0 bis 6 = So)
 sub gibTag {
 	my $n = shift;
 	my @zeit = localtime();
@@ -537,7 +537,7 @@ sub gibTag {
 	return($dow);
 }
 
-# bestimmt den Wochentag von localtime + n Tage (als Parameter) und gibt seinen Namen zurück
+# bestimmt den Wochentag von localtime + n Tage (als Parameter) und gibt seinen Namen zurÃ¼ck
 sub gibTagText {
 	my $n = shift;
 	my @zeit = localtime();
@@ -560,7 +560,7 @@ sub gibTagText {
 	return($dow);
 }
 
-# bestimmt den Wochentag der Nummer n und gibt seinen Namen zurück
+# bestimmt den Wochentag der Nummer n und gibt seinen Namen zurÃ¼ck
 sub gibTagTextOhneOffset {
 	my $dow = shift;
 	if ($dow == 0){
@@ -583,7 +583,7 @@ sub gibTagTextOhneOffset {
 	return($dow);
 }
 
-# gibt zurück, ob es sich um einen Float handelt
+# gibt zurÃ¼ck, ob es sich um einen Float handelt
 sub isNumeric {
 	my $string = scalar(shift);
 	if ($string =~ /^((-?\d*)((.\d\d)|(.\d))$)|^(-?)(\d+)$/) {
@@ -594,7 +594,7 @@ sub isNumeric {
 	}
 }
 
-# gibt zurück, ob es sich um einen Int handelt
+# gibt zurÃ¼ck, ob es sich um einen Int handelt
 sub isNatural {
 	my $string = shift;
 	if ($string =~ m/[^0-9]/) {
@@ -605,7 +605,7 @@ sub isNatural {
 	}
 }
 
-# gibt eine Dezimalzahl als String der Form XX.XX zurück
+# gibt eine Dezimalzahl als String der Form XX.XX zurÃ¼ck
 sub printNumber {
 	$zahl = 100 * shift;
 	my $vorzeichen = "";
@@ -640,14 +640,14 @@ sub Anzahl {
 	return ($count);
 }
 
-# formatiert Texte für MySQL, codiert Sonderzeichen
+# formatiert Texte fÃ¼r MySQL, codiert Sonderzeichen
 sub vorbereiten {
 	my $string = shift;
 	$string = $dbh->quote(encode("utf-8", $string));
 	return ($string);
 }
 
-# fügt eine Nachricht bei einem User hinzu
+# fÃ¼gt eine Nachricht bei einem User hinzu
 sub benachrichtige {
 	my $user = shift;
 	my $nachricht = shift;
@@ -662,7 +662,7 @@ sub benachrichtige {
 # ----- ENDE DES HILFS-FUNKTIONEN-ABSCHNITTES -----
 
 
-# ----- UNIVERSALMETHODEN FÜR LAYOUT UND SICHERHEIT -----
+# ----- UNIVERSALMETHODEN FÃœR LAYOUT UND SICHERHEIT -----
 
 # Kopf jeder Seite, implementiert das Design der Netz-AG
 sub print_header {
@@ -679,12 +679,11 @@ sub print_header {
 		 print "</style>";
 }
 
-# Fu  jeder Seite, GegenstÃ¼ck zu print_header
+# Fu  jeder Seite, GegenstÃƒÂ¼ck zu print_header
 sub print_footer {
 	print "<br><br><br><table width=\"100%\" frame=\"above\" cellpadding=\"1\">";
 	print "<tr><td align=\"left\"> $progName $version</td><td align=\"right\">by $godsName </td></tr>";
-	print "<tr><td colspan=2><b>(1)</b> Sollte eine diese Zeitangaben mehr als 5 Minuten abweichen, das System <b>nicht</b> benutzen und <b>sofort</b> der WaschAG melden! </td></tr>";
-	print "<tr><td colspan=2><b>(2)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
+	print "<tr><td colspan=2><b>(1)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
      open (ENDE, "/var/www/start.inc");
           my @file = <ENDE>;
           print @file;
@@ -707,26 +706,12 @@ sub Titel {
 			$bestand = $row[0];
 			$bonus = $row[1];
 		}
-		print "<tr><td colspan=\"2\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(2)</sup>.</td></tr>";
+		print "<tr><td colspan=\"2\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(1)</sup>.</td></tr>";
 	}
-	$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	$sth->execute();
-	@row = $sth->fetchrow_array();
-	 ($second, $minute, $hour, $day, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
-	$year = 1900 + $yearOffset;
-	$month++;
-	if($month <10){ $month = "0$month";}
-	if($day <10){ $day = "0$day";}
-	if($second <10) {$second = "0$second";}
-	if($hour <10){ $hour = "0$hour";}
-	if($minute <10){ $minute = "0$minute";}
-	$theTime = "$year-$month-$day $hour:$minute:$second";
-	#print "<tr style=\"font-size: 0.8em\"><td>Datenbankzeit: </td><td> ".$row[0]." Uhr</td><td>&nbsp;</td><td>aktuelle Serverzeit: </td><td>$theTime Uhr<b>(1)</b></td></tr></table>";
-	print "<table style=\"font-size: 0.8em\"><tr><td>Datenbankzeit: </td><td> ".$row[0]." Uhr</td><td></td></tr><tr><td>aktuelle Serverzeit: </td><td>$theTime Uhr <b> (1)</b></td></tr></table>"
 }
 
-# Universalfunktion zum Validieren der Logindaten, überprüfen der Zugriffsrechte, setzen des Titels und Erstellen der Menüleisten
-# param anliegen, benötigter Status
+# Universalfunktion zum Validieren der Logindaten, Ã¼berprÃ¼fen der Zugriffsrechte, setzen des Titels und Erstellen der MenÃ¼leisten
+# param anliegen, benÃ¶tigter Status
 sub kopf {
 	my $anliegen = shift;
 	my $neededStatus = shift;
@@ -742,7 +727,7 @@ sub kopf {
 	} else {
 		# Setzen globaler Variablen
 		my $sth = $dbh->prepare("SELECT ip, name, nachname, status, id, gesperrt, login FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-		$sth->execute();	# führt den befehl aus
+		$sth->execute();	# fÃ¼hrt den befehl aus
 		my @row = $sth->fetchrow_array();
 		our $gIp = decode("utf-8", $row[0]);
 		our $gName = decode("utf-8", $row[1]);
@@ -757,11 +742,11 @@ sub kopf {
 			printFehler("<br><br>Momentan werden Wartungsarbeiten am System durchgef&uuml;hrt. Habe bitte ein bisschen Geduld!");
 			return (0);
 		}
-		# Überprüfung der Zugriffsrechte, ggf. Meldung einer Zugriffsverletzung an die DB
+		# ÃœberprÃ¼fung der Zugriffsrechte, ggf. Meldung einer Zugriffsverletzung an die DB
 		if ($gStatus < $neededStatus) {
 			printFehler ("Zugang zu Interna verweigert! Benachrichtigung an Admins versendet.<br><br>Weitere Zugriffsversuche werden geahndet!");
 			$sth = $dbh->prepare("INSERT INTO notify VALUES (".vorbereiten($gId).", ".vorbereiten($anliegen).", ".vorbereiten(gibDatumString(0)).")")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-			$sth->execute();	# führt den befehl aus
+			$sth->execute();	# fÃ¼hrt den befehl aus
 			return (0);
 		}
 
@@ -808,7 +793,7 @@ sub kopf {
 		} elsif ($anliegen eq "shout") {
 			Titel("Massennachricht");
 		}
-		# Menüleisten nach Benutzerstatus
+		# MenÃ¼leisten nach Benutzerstatus
 		if ($gStatus >= $user) {
 			print "<table cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
 			print "<tr><td align=\"center\"><a href=\"$skript?aktion=index\">Willkommensseite</a></td>";
@@ -842,7 +827,7 @@ sub kopf {
 	return (1);
 }
 
-# Macht eine Tabellenzeile für die Userverwaltung mit den beiden Buttons "bearbeiten" und "löschen"
+# Macht eine Tabellenzeile fÃ¼r die Userverwaltung mit den beiden Buttons "bearbeiten" und "lÃ¶schen"
 # param farbe, Zellen als Array (beginnend mit der id)
 sub tabellenZeile {
 	print "<tr>";
@@ -889,7 +874,7 @@ sub normalTabellenZeile {
 	print "</tr>";
 }
 
-# Macht eine Tabellenzeile für die Titelzeile der Tabelle
+# Macht eine Tabellenzeile fÃ¼r die Titelzeile der Tabelle
 # param farbe, Zellen als Array (beginnend mit der id)
 sub normalTabellenZeileKopf {
 	print "<tr>";
@@ -931,7 +916,7 @@ sub logon {
 	print "<input type=\"submit\" value=\"Einloggen\"></form>";
 }
 
-# prüft die beim Login eingegebenen Werte und setzt die Cookies
+# prÃ¼ft die beim Login eingegebenen Werte und setzt die Cookies
 sub firstLogin {
 	my $login = $cgi->param('login');
 	my $pw = crypt($cgi->param('pw'), "ps");
@@ -969,9 +954,9 @@ sub firstLogin {
 # ----- ENDE LOGIN -----
 
 
-# ----- HAUPTMENÜ -----
+# ----- HAUPTMENÃœ -----
 
-# Stellt das Hauptmenü dar, löscht je nach Verlangen die hinterlassene Nachricht
+# Stellt das HauptmenÃ¼ dar, lÃ¶scht je nach Verlangen die hinterlassene Nachricht
 sub hauptMenue {
 	if ($cgi->url_param('del') eq 'yes'){
 		delete_message();
@@ -1013,19 +998,19 @@ sub hauptMenue {
 	}
 }
 
-# Löschen der Nachricht
+# LÃ¶schen der Nachricht
 sub delete_message {
 	my $sth = $dbh->prepare("UPDATE users SET message='' WHERE id='$gId'")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 }
 
-# ----- ENDE HAUPTMENÜ -----
+# ----- ENDE HAUPTMENÃœ -----
 
 
 # ----- USERVERWALTUNG UND ERSTELLUNG -----
 
-# Hilfsfunktion, die Texte darauf überprüft, ob sie leer sind
-# param zu untersuchender String, Bezeichnung für Fehlermeldung
+# Hilfsfunktion, die Texte darauf Ã¼berprÃ¼ft, ob sie leer sind
+# param zu untersuchender String, Bezeichnung fÃ¼r Fehlermeldung
 sub notLeer {
 	my $string = shift;
 	my $bezeichnung = shift;
@@ -1036,8 +1021,8 @@ sub notLeer {
 	return (0);
 }
 
-# Hilfsfunktion, die überprüft, ob es sich um ein mögliches TvK-Zimmer handelt
-# param zu untersuchender String, Bezeichnung für Fehlermeldung
+# Hilfsfunktion, die Ã¼berprÃ¼ft, ob es sich um ein mÃ¶gliches TvK-Zimmer handelt
+# param zu untersuchender String, Bezeichnung fÃ¼r Fehlermeldung
 sub isValidZimmer {
 	$zimmer = shift;
 	if (int($zimmer / 100) >= 1 && int($zimmer / 100) <= 15 && ($zimmer % 100 >= 1 && $zimmer % 100 <= 16)){
@@ -1050,8 +1035,8 @@ sub isValidZimmer {
 	}
 }
 
-# Hilfsfunktion, die überprüft, ob es sich um eine im TvK gültige IP handelt
-# param zu untersuchender String, Bezeichnung für Fehlermeldung
+# Hilfsfunktion, die Ã¼berprÃ¼ft, ob es sich um eine im TvK gÃ¼ltige IP handelt
+# param zu untersuchender String, Bezeichnung fÃ¼r Fehlermeldung
 sub isValidIP {
 	my $ip = shift;
 	if ($ip eq "0.0.0.0") {
@@ -1064,7 +1049,7 @@ sub isValidIP {
 	}
 }
 
-#Hilfsfunktion zur Generierung neuer Passwörter
+#Hilfsfunktion zur Generierung neuer PasswÃ¶rter
 sub genPw {
    my $length = 8 + (int(rand(2)));
    my @possible = ('abcdefghijkmnpqrstuvwxyz', '23456789', 'ABCDEFGHJKLMNPQRSTUVWXYZ');
@@ -1087,7 +1072,7 @@ sub genPw {
    return $password;
 }
 
-# Formular zum ändern des Passwortes
+# Formular zum Ã¤ndern des Passwortes
 sub changePW {
 	print "<form action=\"$skript?aktion=do_change_pw\" method=\"post\">";
 	print "<table cellspacing=\"5\" cellpadding=\"3\">";
@@ -1128,7 +1113,7 @@ sub doChange {
 	changePW();
 }
 
-# Formular zum Eingeben der Daten für einen neuen User
+# Formular zum Eingeben der Daten fÃ¼r einen neuen User
 sub gibNewForm {
 	if(sperrCheck()==1) { return; }
 	my $login = shift;
@@ -1352,14 +1337,14 @@ sub user_finance {
 	}
 }
 
-# Abfragelink, ob ein User wirklich gelöscht werden soll
+# Abfragelink, ob ein User wirklich gelÃ¶scht werden soll
 sub delete_user {
 	if(sperrCheck()==1) { return; }
 	my $id = shift;
 	print "<a href=\"$skript?aktion=mach_tot&id=$id\">Dieser Link l&ouml;scht User $id endg&uuml;ltig!</a>";
 }
 
-# löscht einen User endgültig
+# lÃ¶scht einen User endgÃ¼ltig
 sub deleteUserEndgueltig {
 	if(sperrCheck()==1) { return; }
 	my $id = shift;
@@ -1373,7 +1358,7 @@ sub deleteUserEndgueltig {
 
 sub start_edit {
 	if(sperrCheck()==1) { return; }
-	#holt die Daten eines Users aus der DB um sie dem EditForm zu übergeben
+	#holt die Daten eines Users aus der DB um sie dem EditForm zu Ã¼bergeben
 	my $id = shift;
 	my $sth = $dbh->prepare("SELECT login , name , nachname , status , zimmer , ip , gesperrt , message , bemerkung, termine, lastlogin FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
@@ -1454,7 +1439,7 @@ sub do_edit {
 	}
 
 	my $sth = $dbh->prepare("SELECT id FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	$sth->execute();	# führt den befehl aus
+	$sth->execute();	# fÃ¼hrt den befehl aus
 	my @row = $sth->fetchrow_array;
 	if (scalar(@row) != 0) {
 		if ($row[0] != $id) {
@@ -1511,7 +1496,7 @@ sub do_edit {
 }
 
 
-# ----- Ein-/Auszahlung, Überweisung -----
+# ----- Ein-/Auszahlung, Ãœberweisung -----
 
 sub manage_money {
 	if(sperrCheck()==1) { return; }
@@ -1583,7 +1568,7 @@ sub manage_money {
 	print "</table></form>";
 }
 
-# Transaktion, wenn sich jmd Geld zum Waschen ein-/auszahlen lässt
+# Transaktion, wenn sich jmd Geld zum Waschen ein-/auszahlen lÃ¤sst
 sub admin_transaktion {
 	if(sperrCheck()==1) { return; }
 	my $id = $cgi->url_param('id');
@@ -1621,7 +1606,7 @@ sub admin_transaktion {
 	}
 }
 
-# prüft Gültigkeit einer Stornierung und führt gegebenenfalls diese durch
+# prÃ¼ft GÃ¼ltigkeit einer Stornierung und fÃ¼hrt gegebenenfalls diese durch
 sub storno {
 	if(sperrCheck()==1) { return; }
 	my $id = $cgi->url_param('id');
@@ -1654,7 +1639,7 @@ sub storno {
 	printFehler("Kulanz gew&auml;hrt!");
 }
 
-# vermerkt Transaktionen für User
+# vermerkt Transaktionen fÃ¼r User
 sub geldbewegung {
 	if(sperrCheck()==1) { return; }
 	my $user = shift;
@@ -1690,7 +1675,7 @@ sub geldbewegung {
 	$sth->execute()|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor;
 }
 
-# vermerkt Transaktionen für Waschag-Mitglieder
+# vermerkt Transaktionen fÃ¼r Waschag-Mitglieder
 sub quittung {
 	if(sperrCheck()==1) { return; }
 	my $user = shift;
@@ -1722,7 +1707,7 @@ sub quittung {
 	$sth->execute();
 }
 
-# Formular, um eine User-User-Überweisung anzulegen
+# Formular, um eine User-User-Ãœberweisung anzulegen
 sub ueberweisungsFormular {
 	if(sperrCheck("&Uuml;berweisungsfunktion deaktiviert!")==1) { return; }
 	print "<form action=\"$skript?aktion=ueberweisung\" method=\"post\">";
@@ -1734,7 +1719,7 @@ sub ueberweisungsFormular {
 	print "</table><br><input type=\"submit\" value=\"Formulardaten absenden\">";
 }
 
-# führt die Überweisung aus
+# fÃ¼hrt die Ãœberweisung aus
 sub ueberweisung {
 	if(sperrCheck("N&ouml; dein Geld bleibt erstmal hier...")==1) { return; }
 	my $empfang = vorbereiten($cgi->param('login'));
@@ -1812,10 +1797,10 @@ sub self_transaktion {
 	}
 }
 
-# ----- ENDE EIN-/AUSZAHLUNG, ÜBERWEISUNG -----
+# ----- ENDE EIN-/AUSZAHLUNG, ÃœBERWEISUNG -----
 
 
-# ----- KONTOFÜHRUNG -----
+# ----- KONTOFÃœHRUNG -----
 
 sub kontoAuszug {
 	my $sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand, bonus FROM finanzlog WHERE user='$gId' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
@@ -1875,7 +1860,7 @@ sub kontoAuszug {
 	}
 }
 
-# ----- ENDE KONTOFÜHRUNG -----
+# ----- ENDE KONTOFÃœHRUNG -----
 
 
 
@@ -1931,7 +1916,7 @@ sub statistik {
 	for (my $i = 1; $i <= 15; $i++) {
 		$etagenGeld[$i] = 0;
 	}
-	$sth = $dbh->prepare("SELECT id, zimmer FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT id, zimmer FROM users WHERE status < $waschag")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my $sth2;
 	my @row2;
@@ -1943,18 +1928,14 @@ sub statistik {
 		$sth2->execute();
 		@row2 = $sth2->fetchrow_array();
 		$etagenGeld[$temp] += $row2[0];
+		$finanzSumme += $row2[0];
 	}
 
 	# Geld bei den Nutzern und der AG
 	$sth = $dbh->prepare("SELECT id FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
-	$finanzSumme = 0;
 	$waschFinanz = 0;
 	while (@row = $sth->fetchrow_array()) {
-		$sth2 = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user=$row[0] ORDER BY datum DESC LIMIT 1")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-		$sth2->execute();
-		@row2 = $sth2->fetchrow_array();
-		$finanzSumme += $row2[0];
 		$sth2 = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$row[0] ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
 		$sth2->execute();
 		@row2 = $sth2->fetchrow_array();
@@ -2025,7 +2006,7 @@ sub notifyVerwaltung {
 	#holen der Daten
 	$sortierung = $cgi->url_param('sort');
 	my $sth = $dbh->prepare("SELECT id, (SELECT nachname FROM users where id=notify.id), (SELECT name FROM users where id=notify.id), ziel, datum FROM notify ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	$sth->execute();	# führt den befehl aus
+	$sth->execute();	# fÃ¼hrt den befehl aus
 	my @row;
 	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 	normalTabellenZeileKopf("black",
@@ -2049,7 +2030,7 @@ sub maschinenVerwaltung {
 	if(sperrCheck()==1) { return; }
 	#holen der Daten
 	my $sth = $dbh->prepare("SELECT id, status, bemerkung, (SELECT nachname FROM users where id=waschmaschinen.von), (SELECT name FROM users where id=waschmaschinen.von) FROM waschmaschinen")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	$sth->execute();	# führt den befehl aus
+	$sth->execute();	# fÃ¼hrt den befehl aus
 	my @row;
 	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 	normalTabellenZeileKopf("black",
@@ -2077,7 +2058,7 @@ sub maschinenVerwaltung {
 	print "</table><br><br><br>";
 	if ($gStatus >= $god) {
 		$sth = $dbh->prepare("SELECT zweck FROM config ORDER BY zweck ASC")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-		$sth->execute();	# führt den befehl aus
+		$sth->execute();	# fÃ¼hrt den befehl aus
 		my @contents;
 		my @werte;
 		my $i = 0;
@@ -2087,7 +2068,7 @@ sub maschinenVerwaltung {
 			$i++;
 		}
 		$sth = $dbh->prepare("SELECT wert FROM config ORDER BY zweck ASC")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-		$sth->execute();	# führt den befehl aus
+		$sth->execute();	# fÃ¼hrt den befehl aus
 		normalTabellenZeileKopf("black", @contents);
 		print "<form action=\"$skript?aktion=set_config\" method=\"post\">";
 		@row = $sth->fetchrow_array();
@@ -2112,7 +2093,7 @@ sub maschinenVerwaltung {
 	}
 }
 
-# Setzt die Änderungen für Waschmaschinen
+# Setzt die Ã„nderungen fÃ¼r Waschmaschinen
 sub maschineSetConfig {
 	if(sperrCheck()==1) { return; }
 	my $W_Id = shift;
@@ -2170,7 +2151,7 @@ sub maschineSetConfig {
 	$dbh->disconnect;
 }
 
-# Setzt die allgemeinen Änderungen
+# Setzt die allgemeinen Ã„nderungen
 sub set_config {
 	if(sperrCheck()==1) { return; }
 	my $storn = $cgi->param('storn');
@@ -2213,7 +2194,7 @@ sub set_config {
 	}
 }
 
-# Zeigt das Formular zum Ändern der Preise an
+# Zeigt das Formular zum Ã„ndern der Preise an
 sub preisListe {
 	if(sperrCheck()==1) { return; }
 	my @row;
@@ -2237,7 +2218,7 @@ sub preisListe {
 	print "</table><br><p><input type=\"submit\" value=\"Preise &auml;ndern\"></p></form>";
 }
 
-# Ändert die Preise individuell
+# Ã„ndert die Preise individuell
 sub set_preis {
 	if(sperrCheck()==1) { return; }
 	my @preis;
@@ -2437,7 +2418,7 @@ sub bucheTermin {
 
 	my $preis = getPreis($tag, $zeit);
 
-	#frei Waschen für WaschAG
+	#frei Waschen fÃ¼r WaschAG
 #	if ($gStatus >= $waschag) {
 #		$preis = 0;
 #	}
@@ -2478,7 +2459,7 @@ sub bucheTermin {
 	}
 }
 
-# Stellt Zahlungsfähigkeit fest und bucht ggf ab
+# Stellt ZahlungsfÃ¤higkeit fest und bucht ggf ab
 sub geldAbbuchen {
 	my $preis = shift;
 	my $datum = shift;
@@ -2882,7 +2863,7 @@ sub new_doku {
 	edit_this_doku($sprache, $paragraph, $abschnitt, $satz);
 }
 
-# gibt die Kapitelzahl "schön" aus
+# gibt die Kapitelzahl "schÃ¶n" aus
 sub print_chapter {
 	my $paragraph = shift;
 	my $abschnitt = shift;
@@ -2907,14 +2888,14 @@ sub look_old_data() {
 	my $active_file = shift; # aktive Datei; . bei Verzeichnis
 	if ($active_file eq '.') {
 		my $parent = $active_dir;
-		while (chop($parent) ne '/') {} # übergeordnetes Verzeichnis
+		while (chop($parent) ne '/') {} # Ã¼bergeordnetes Verzeichnis
 		my $output;
 		$output = `cd $active_dir && find -maxdepth 1 -type d`;
 		$output = substr($output, 4);
 		my @dirs = split('\n./', $output);
 		@dirs = sort(@dirs);
 		if ($parent ne ".") {
-			print "<a href=\"$skript?aktion=look_old_data&dir=$parent&file=.\">..</a><br>"; #in ein Verzeichnis höher wechseln, außer wenn bereits im tiefsten (./logs)
+			print "<a href=\"$skript?aktion=look_old_data&dir=$parent&file=.\">..</a><br>"; #in ein Verzeichnis hÃ¶her wechseln, auÃŸer wenn bereits im tiefsten (./logs)
 		}
 		foreach(@dirs) {
 			print "<a href=\"$skript?aktion=look_old_data&dir=$active_dir/$_&file=.\">$_</a><br>"
@@ -2958,7 +2939,7 @@ sub create_shout {
 	print "<input type=\"submit\" value=\"Abschicken\"></p></form>";
 }
 
-# fügt eine Nachricht bei einem User hinzu
+# fÃ¼gt eine Nachricht bei einem User hinzu
 sub massenNachricht {
 	my $nachricht = $cgi->param('message');
 	my $nachricht = "<br>".encode("utf-8", $nachricht);
