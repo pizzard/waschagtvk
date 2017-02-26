@@ -53,7 +53,8 @@ public:
 
 	QTime* countdown;	//innere Uhr ;)
 	
-	TerminVerwaltung(QWidget *parent = 0, WashingProgram* mama = 0);
+	TerminVerwaltung(QObject* parent = 0);
+	TerminVerwaltung(WashingProgram* mama = 0);
 	~TerminVerwaltung();
 
 	WashingProgram* mutter;

@@ -6,7 +6,12 @@
 #include "crypt.h"
 #include <exception>
 
-TerminVerwaltung::TerminVerwaltung(QWidget *parent, WashingProgram* mama) : QWidget(parent){
+TerminVerwaltung::TerminVerwaltung(QObject *parent):
+    TerminVerwaltung(dynamic_cast<WashingProgram*>(parent))
+{
+}
+
+TerminVerwaltung::TerminVerwaltung(WashingProgram* mama) : QWidget(mama){
 // Zuordnung der Maschinen
 
    maschinenNr = new int[3];
