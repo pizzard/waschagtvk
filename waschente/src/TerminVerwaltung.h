@@ -35,8 +35,6 @@
 // Inaktiv WaschAG Status Identifier
 #define INACTIVE_WASCHAG_STATUS 3
 
-class WashingProgram;
-
 class TerminVerwaltung : public QWidget{
   Q_OBJECT
   
@@ -53,11 +51,8 @@ public:
 
 	QTime* countdown;	//innere Uhr ;)
 	
-	TerminVerwaltung(QObject* parent = 0);
-	TerminVerwaltung(WashingProgram* mama = 0);
+	TerminVerwaltung(QWidget* parent = 0);
 	~TerminVerwaltung();
-
-	WashingProgram* mutter;
         
 	QSqlDatabase db;
 	

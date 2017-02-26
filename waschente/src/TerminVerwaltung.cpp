@@ -6,12 +6,7 @@
 #include "crypt.h"
 #include <exception>
 
-TerminVerwaltung::TerminVerwaltung(QObject *parent):
-    TerminVerwaltung(dynamic_cast<WashingProgram*>(parent))
-{
-}
-
-TerminVerwaltung::TerminVerwaltung(WashingProgram* mama) : QWidget(mama){
+TerminVerwaltung::TerminVerwaltung(QWidget *parent) : QWidget(parent){
 // Zuordnung der Maschinen
 
    maschinenNr = new int[3];
@@ -49,8 +44,6 @@ TerminVerwaltung::TerminVerwaltung(WashingProgram* mama) : QWidget(mama){
    balkenText = new QLabel();
    balkenText->setFont(balken_schrift);
    balkenText->setPalette(pal);
-   
-   mutter = mama;
    
    control = new QPushButton("Termin wahrnehmen");
    connect(control, SIGNAL(clicked()), this, SLOT(iWannaWash()));
