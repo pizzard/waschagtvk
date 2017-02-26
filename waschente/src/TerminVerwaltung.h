@@ -1,27 +1,18 @@
 #ifndef TERMIN_INCLUDE_
 #define TERMIN_INCLUDE_
 
-#include <iostream>
-#include <QtGui>
-#include <QApplication>
+#include <vector>
+#include <array>
+#include <memory>
 #include <QWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QWidget>
 #include <QGroupBox>
-#include <QMessageBox>
-#include <QFont>
-#include <QtSql>
-#include <QSqlError>
-#include <QSqlDriver>
-#include <QInputDialog>
 #include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QLabel>
 #include <QProgressBar>
-#include <QPalette>
-#include <QtNetwork>
-#include <QByteArray>
+#include <QTimer>
 #include "Hilfsfunktionen.h"
 
 // Server-Adresse DB
@@ -36,43 +27,43 @@
 #define INACTIVE_WASCHAG_STATUS 3
 
 class TerminVerwaltung : public QWidget{
-  Q_OBJECT
+	Q_OBJECT
   
 public:
+	TerminVerwaltung(QWidget* parent = 0);
+	~TerminVerwaltung();
+private:
 	int anzahl;		//ANZAHL MASCHINEN -> DB
 	int antritt;		//ANTRITTSZEIT IN MIN -> DB
 	int relais;		//RELAISZEIT IN MIN -> DB
 	int vorhaltezeit;	//VORHALTEZEIT KONTODATEN IN MONATEN -> DB
 	int WAGvorhaltezeit;	//VORHALTEZEIT WAG-KONTODATEN IN MONATEN -> DB
 	int aktZeit;		//aktuelle Zeit
-	bool* status;		//speichert den Status der Maschinen
-	bool* aktStatus;	//speichert Zustand des Relais
-	int* maschinenNr;	//speichert, welche Maschine welches Relais hat
+	std::vector<bool> status;		//speichert den Status der Maschinen
+	std::vector<bool> aktStatus;	//speichert Zustand des Relais
+	static const std::array<const int,3> maschinenNr;	//speichert, welche Maschine welches Relais hat
 
-	QTime* countdown;	//innere Uhr ;)
-	
-	TerminVerwaltung(QWidget* parent = 0);
-	~TerminVerwaltung();
-        
+	QTime countdown;	//innere Uhr ;)
+
 	QSqlDatabase db;
 	
-	QProgressBar* balken;
-	QLabel*** tabelle;
-	QLabel* message;
-	QLabel* balkenText;
-        
-        QString** sagEs;
-	
-	QTimer* timer;
-	QTimer* timer2;
-	
-	QGroupBox ** box;
-	QVBoxLayout** layout;
-	QGridLayout* layout_grid;
-	QGroupBox* messageBox;
-	QVBoxLayout* messageLayout;
-	
-	QPushButton* control;
+	QProgressBar balken;
+	std::vector<std::array<std::unique_ptr<QLabel>,3>> tabelle;
+	QLabel message;
+	QLabel balkenText;
+
+	std::array<QString,5> sagEs;
+
+	QTimer timer;
+	QTimer timer2;
+
+	std::vector<std::unique_ptr<QGroupBox>> box;
+	std::vector<std::unique_ptr<QVBoxLayout>> layout;
+	QGridLayout layout_grid;
+	QGroupBox messageBox;
+	QVBoxLayout messageLayout;
+
+	QPushButton control;
 
 public slots:
 	void update();
