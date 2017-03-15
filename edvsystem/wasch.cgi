@@ -232,7 +232,7 @@ sub wieLangNoch {
 	my $zeit = substr(gibWaschTerminTechnisch(shift),0,5).":00";
 	my $datum = shift;
 	my $zeitstring = $datum." ".$zeit;
-	my $sth = $dbh->prepare("SELECT (UNIX_TIMESTAMP('$zeitstring')-UNIX_TIMESTAMP(NOW()))/60") || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT (UNIX_TIMESTAMP('$zeitstring')-UNIX_TIMESTAMP(NOW()))/60") || die "Fehler bei der Datenverarbeitung! 6cbac367 $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	return ($row[0]);
@@ -260,9 +260,9 @@ sub wieLangSchon {
 	my $zeitstring = $datum." ".$zeit;
 	my $sth;
 	if ($waschzeit < 15) {
-		$sth = $dbh->prepare("SELECT (UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP('$zeitstring'))/60") || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT (UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP('$zeitstring'))/60") || die "Fehler bei der Datenverarbeitung! 3e8e7ead $DBI::errstr\n";
 	} else {
-		$sth = $dbh->prepare("SELECT (UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(DATE_ADD('$zeitstring', INTERVAL 1 DAY)))/60") || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT (UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(DATE_ADD('$zeitstring', INTERVAL 1 DAY)))/60") || die "Fehler bei der Datenverarbeitung! 9c4e7652 $DBI::errstr\n";
 	}
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
@@ -271,7 +271,7 @@ sub wieLangSchon {
 
 # holt die Konfiguration aus der DB
 sub getConfig {
-	my $sth = $dbh->prepare("SELECT * FROM config")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT * FROM config")|| die "Fehler bei der Datenverarbeitung! ba97498a $DBI::errstr\n";
 	$sth->execute();
 	while (my @row = $sth->fetchrow_array()) {
 		if($row[0] eq "Stornierzeit (in Min)") { $stornTime = $row[1]; }
@@ -281,11 +281,11 @@ sub getConfig {
 		elsif($row[0] eq "Termine pro Monat") { $termPerMonth = $row[1]; }
 		elsif($row[0] eq "Freigeld fuer WaschAG") { $freiGeld = $row[1]; }
 	}
-	$sth = $dbh->prepare("SELECT COUNT(*) FROM waschmaschinen WHERE status = '1'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("SELECT COUNT(*) FROM waschmaschinen WHERE status = '1'")|| die "Fehler bei der Datenverarbeitung! 136e8121 $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	$termPerDay = $row[0];
-	$sth = $dbh->prepare("SELECT COUNT(*) FROM waschmaschinen")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("SELECT COUNT(*) FROM waschmaschinen")|| die "Fehler bei der Datenverarbeitung! 13b8ac9e $DBI::errstr\n";
 	$sth->execute();
 	@row = $sth->fetchrow_array();
 	$anzahlMaschinen = $row[0];
@@ -334,7 +334,7 @@ sub validate {
 	my $ip = $ENV{'REMOTE_ADDR'};
 	my $login = shift;
 	my $pw = shift;
-	my $sth = $dbh->prepare("SELECT pw , ip, status, id, NOW(), login FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT pw , ip, status, id, NOW(), login FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! f6daada7 $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
 	if (scalar(@row) == 0) {
@@ -385,7 +385,7 @@ sub checkLogin {
 # Zählt, wie oft ein Loginname in der DB vorliegt
 sub countLogin {
 	my $loginToProof = vorbereiten(shift);
-	my $sth = $dbh->prepare("SELECT * FROM users WHERE login = $loginToProof")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT * FROM users WHERE login = $loginToProof")|| die "Fehler bei der Datenverarbeitung! 808dbf44 $DBI::errstr\n";
 	$sth->execute();
 	my @row;
 	my $i = 0;
@@ -401,7 +401,7 @@ sub darf_bearbeiten {
 	if ($zielId == $gId) {
 		return (1);
 	}
-	my $sth = $dbh->prepare("SELECT status FROM users WHERE id = '$zielId'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT status FROM users WHERE id = '$zielId'")|| die "Fehler bei der Datenverarbeitung! 82ab2f46 $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if ($row[0] < $gStatus){
@@ -651,11 +651,11 @@ sub vorbereiten {
 sub benachrichtige {
 	my $user = shift;
 	my $nachricht = shift;
-	my $sth = $dbh->prepare("SELECT message FROM users WHERE id = '$user'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT message FROM users WHERE id = '$user'")|| die "Fehler bei der Datenverarbeitung! 4a72d5f2 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
 	$row[0] = $row[0]."<br>".encode("utf-8", $nachricht);
-	$sth = $dbh->prepare("UPDATE users SET message='$row[0]' WHERE id = '$user'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("UPDATE users SET message='$row[0]' WHERE id = '$user'")|| die "Fehler bei der Datenverarbeitung! ee4807e9 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 }
 
@@ -699,7 +699,7 @@ sub Titel {
 	my $sth;
 	my @row;
 	if ($titel ne "Login") {
-		$sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE user='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE user='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 34739ae6 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		my $bestand = 0;
 		if (@row = $sth->fetchrow_array()) {
@@ -726,7 +726,7 @@ sub kopf {
 		return (0);
 	} else {
 		# Setzen globaler Variablen
-		my $sth = $dbh->prepare("SELECT ip, name, nachname, status, id, gesperrt, login FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		my $sth = $dbh->prepare("SELECT ip, name, nachname, status, id, gesperrt, login FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! 6d31363d $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();	# führt den befehl aus
 		my @row = $sth->fetchrow_array();
 		our $gIp = decode("utf-8", $row[0]);
@@ -745,7 +745,7 @@ sub kopf {
 		# Überprüfung der Zugriffsrechte, ggf. Meldung einer Zugriffsverletzung an die DB
 		if ($gStatus < $neededStatus) {
 			printFehler ("Zugang zu Interna verweigert! Benachrichtigung an Admins versendet.<br><br>Weitere Zugriffsversuche werden geahndet!");
-			$sth = $dbh->prepare("INSERT INTO notify VALUES (".vorbereiten($gId).", ".vorbereiten($anliegen).", ".vorbereiten(gibDatumString(0)).")")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+			$sth = $dbh->prepare("INSERT INTO notify VALUES (".vorbereiten($gId).", ".vorbereiten($anliegen).", ".vorbereiten(gibDatumString(0)).")")|| die "Fehler bei der Datenverarbeitung! 687ac82b $DBI::errstr\n";	# bereitet den befehl vor
 			$sth->execute();	# führt den befehl aus
 			return (0);
 		}
@@ -924,24 +924,24 @@ sub firstLogin {
 		$login = vorbereiten($login);
 		getConfig();
 		my $jetzt = gibDatumString(0);
-		my $sth = $dbh->prepare("SELECT lastlogin FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		my $sth = $dbh->prepare("SELECT lastlogin FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! 77a856ba $DBI::errstr\n";
 		$sth->execute();
 		my @row = $sth->fetchrow_array();
 		if(substr($row[0], 5, 2) ne substr($jetzt, 5, 2)) { # Monatwechsel
-			$sth = $dbh->prepare("UPDATE users SET termine='0', gotfreimarken='0' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			$sth = $dbh->prepare("UPDATE users SET termine='0', gotfreimarken='0' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! 4c4b764e $DBI::errstr\n";
 			$sth->execute();
 		}
 		# Freimarken-Geschichte
-		$sth = $dbh->prepare("SELECT status, gotfreimarken, id FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT status, gotfreimarken, id FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! b6957f26 $DBI::errstr\n";
 		$sth->execute();
 		@row = $sth->fetchrow_array();
 		if($row[0] >= $waschag && $row[1] == 0) {
-				$sth = $dbh->prepare("UPDATE users SET gotfreimarken='1' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+				$sth = $dbh->prepare("UPDATE users SET gotfreimarken='1' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! 8aa26093 $DBI::errstr\n";
 				$sth->execute();
 				geldbewegung($row[2], 0, encode("utf-8", "monatliches Freigeld f&uuml;r WaschAG-Mitglieder"), $freiGeld);
 				benachrichtige($row[2], "Du hast dein monatliches Freigeld f&uuml;r WaschAG-Mitglieder erhalten.");
 		}
-		$sth = $dbh->prepare("UPDATE users SET lastlogin='$jetzt' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE users SET lastlogin='$jetzt' WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! 00dff8d8 $DBI::errstr\n";
 		$sth->execute();
 		setCookies($login, $pw);
 	} else {
@@ -964,7 +964,7 @@ sub hauptMenue {
 	if ($cgi->url_param('storn') eq 'yes'){
 		stornieren($cgi->url_param('datum'), $cgi->url_param('zeit'), $cgi->url_param('maschine'));
 	}
-	my $sth = $dbh->prepare("SELECT message , gesperrt, termine FROM users WHERE id='$gId'")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT message , gesperrt, termine FROM users WHERE id='$gId'")||die "Fehler bei der Datenverarbeitung! 5ca3222e $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if ($row[0] ne "") {
@@ -978,11 +978,11 @@ sub hauptMenue {
 	} else {
 		print "Du hast bereits $monatlTermine Termine von maximal $termPerMonth erlaubten Terminen pro Monat wahrgenommen oder nicht storniert.<br>";
 		print "Damit bleiben dir noch ".($termPerMonth-$row[2])." Termine.";
-		$sth = $dbh->prepare("SELECT COUNT(*) FROM termine WHERE user='$gId' ORDER BY datum ASC, zeit ASC, maschine ASC")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT COUNT(*) FROM termine WHERE user='$gId' ORDER BY datum ASC, zeit ASC, maschine ASC")||die "Fehler bei der Datenverarbeitung! 3cae7410 $DBI::errstr\n";
 		$sth->execute();
 		@row = $sth->fetchrow_array();
 		if ($row[0] > 0) {
-			$sth = $dbh->prepare("SELECT wochentag, datum, zeit, maschine, bonus FROM termine WHERE user='$gId' ORDER BY datum ASC, zeit ASC, maschine ASC")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			$sth = $dbh->prepare("SELECT wochentag, datum, zeit, maschine, bonus FROM termine WHERE user='$gId' ORDER BY datum ASC, zeit ASC, maschine ASC")||die "Fehler bei der Datenverarbeitung! 1f023766 $DBI::errstr\n";
 			$sth->execute();
 			print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\"><tr><th>Deine gebuchten Termine:</th></tr></table>";
 			print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
@@ -1000,7 +1000,7 @@ sub hauptMenue {
 
 # Löschen der Nachricht
 sub delete_message {
-	my $sth = $dbh->prepare("UPDATE users SET message='' WHERE id='$gId'")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("UPDATE users SET message='' WHERE id='$gId'")||die "Fehler bei der Datenverarbeitung! 86ebf40d $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 }
 
@@ -1099,8 +1099,8 @@ sub doChange {
 			if (checkPW($pw) == 1) {
 				$pw = crypt($pw, "ps");
 				my $sql = "UPDATE users SET pw='$pw' WHERE id='$gId'";
-				$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
-				$sth->execute() || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+				$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! 1f998d66 $DBI::errstr\n";
+				$sth->execute() || die "Fehler bei der Datenverarbeitung! 5044c598 $DBI::errstr\n";
 				printFehler("Dein Passwort wurde erfolgreich ge&auml;ndert!\n");
 				printFehler("Du musst dich jetzt neu <a href=\"$skript?aktion=login\">einloggen.</a>");
 				return;
@@ -1151,7 +1151,7 @@ sub create_user {
 				 + isValidZimmer($zimmer)
 				 + isValidIP($ip);
 
-  	my $sth = $dbh->prepare("SELECT * FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+  	my $sth = $dbh->prepare("SELECT * FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! e9856a35 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	if (my @row = $sth->fetchrow_array()) {
 		printFehler("Loginname bereits vorhanden!");
@@ -1162,12 +1162,12 @@ sub create_user {
 
 
 	if ($ok == 0) {
-		$sth = $dbh->prepare("SELECT id FROM users WHERE ip = '$ip'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT id FROM users WHERE ip = '$ip'")|| die "Fehler bei der Datenverarbeitung! dd1743e5 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		if (@row = $sth->fetchrow_array()) {
 			printFehler("<b><font color=\"#ff0000\">Ip bereits bei User $row[0] vorhanden. Unbedingt &uuml;berpr&uuml;fen!</font></b>");
 		}
-		$sth = $dbh->prepare("SELECT id FROM users WHERE zimmer = '$zimmer'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT id FROM users WHERE zimmer = '$zimmer'")|| die "Fehler bei der Datenverarbeitung! d9218223 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		if (@row = $sth->fetchrow_array()) {
 			printFehler("<b><font color=\"#ff0000\">Zimmernummer bereits bei User $row[0] vorhanden. Unbedingt &uuml;berpr&uuml;fen!</font></b>");
@@ -1176,16 +1176,16 @@ sub create_user {
 		printFehler("<br>Es wurde folgendes Passwort generiert: <b>$pw</b> <br>");
 		$pw = crypt($pw, "ps");
 		my $sql = "INSERT INTO users ( id , name , nachname , pw , login , zimmer , gesperrt , message , ip , status, von ) VALUES ('', '$name', '$nname', '$pw', '$login', '$zimmer', '0', '', '$ip', '1' , '$gId')";
-		$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
-		$sth->execute() || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
-		$sth = $dbh->prepare("SELECT MAX(id) FROM users")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! f04e09aa $DBI::errstr\n";
+		$sth->execute() || die "Fehler bei der Datenverarbeitung! 5b94b8a6 $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT MAX(id) FROM users")|| die "Fehler bei der Datenverarbeitung! 4f2ad41d $DBI::errstr\n";	# bereitet den befehl vor
+	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! 416cbb69 $DBI::errstr\n";
 		my @row = $sth->fetchrow_array();
-		$sth = $dbh->prepare("INSERT INTO finanzlog VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW(), '0')")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
-	  	$sth = $dbh->prepare("INSERT INTO waschagtransaktionen VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW())")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
-		$sth = $dbh->prepare("SELECT id FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("INSERT INTO finanzlog VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW(), '0')")|| die "Fehler bei der Datenverarbeitung! 54775503 $DBI::errstr\n";	# bereitet den befehl vor
+	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! 416cbb69 $DBI::errstr\n";
+	  	$sth = $dbh->prepare("INSERT INTO waschagtransaktionen VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW())")|| die "Fehler bei der Datenverarbeitung! fe7a7ffb $DBI::errstr\n";	# bereitet den befehl vor
+	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! 416cbb69 $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT id FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! 40e47bf6 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		@row = $sth->fetchrow_array();
 		printFehler("Der User Nummer - $row[0] - wurde erfolgreich erstellt!");
@@ -1239,7 +1239,7 @@ ENDE_DES_STRINGS
 			print "Zeige nur User die auf Etage ".$etagennummer." wohnen:";
 		}
 	}
-	my $sth = $dbh->prepare("SELECT id, nachname, name, login, zimmer, gesperrt, status, lastlogin, ip FROM users WHERE ".$zimmer_add." ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT id, nachname, name, login, zimmer, gesperrt, status, lastlogin, ip FROM users WHERE ".$zimmer_add." ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! f24ffdb3 $DBI::errstr\n";
 	$sth->execute();
 	my @row;
 	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
@@ -1268,7 +1268,7 @@ ENDE_DES_STRINGS
 # zeigt Kontoauszug von einem User an
 sub user_finance {
 	my $id = shift;
-	my $sth = $dbh->prepare("SELECT name, nachname, status FROM users WHERE id='$id'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT name, nachname, status FROM users WHERE id='$id'")|| die "Fehler bei der Datenverarbeitung! 5c0bff64 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row;
 	my $status;
@@ -1281,7 +1281,7 @@ sub user_finance {
 	} else {
 		printFehler("User existiert nicht!");
 	}
-	$sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand, bonus FROM finanzlog WHERE user='$id' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand, bonus FROM finanzlog WHERE user='$id' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! e7a4380f $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	if (@row = $sth->fetchrow_array()) {
 		my @temp = @row;
@@ -1307,7 +1307,7 @@ sub user_finance {
 		print "</th></tr></table><br><br>";
 	}
 	if($status >= $waschag) {
-		$sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand FROM waschagtransaktionen WHERE user='$id' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand FROM waschagtransaktionen WHERE user='$id' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! 84574db4 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		my @row;
 		if (@row = $sth->fetchrow_array) {
@@ -1351,7 +1351,7 @@ sub deleteUserEndgueltig {
 	if (darf_bearbeiten($id) == 0) {
 		return;
 	}
-	my $sth = $dbh->prepare("DELETE FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("DELETE FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! 3d208984 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	printFehler("User gel&ouml;scht");
 }
@@ -1360,7 +1360,7 @@ sub start_edit {
 	if(sperrCheck()==1) { return; }
 	#holt die Daten eines Users aus der DB um sie dem EditForm zu übergeben
 	my $id = shift;
-	my $sth = $dbh->prepare("SELECT login , name , nachname , status , zimmer , ip , gesperrt , message , bemerkung, termine, lastlogin FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT login , name , nachname , status , zimmer , ip , gesperrt , message , bemerkung, termine, lastlogin FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! f18b4e03 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
 	gibEditForm($id, @row)
@@ -1438,7 +1438,7 @@ sub do_edit {
 		$ok = 1;
 	}
 
-	my $sth = $dbh->prepare("SELECT id FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT id FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! 2b8fb005 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();	# führt den befehl aus
 	my @row = $sth->fetchrow_array;
 	if (scalar(@row) != 0) {
@@ -1455,15 +1455,15 @@ sub do_edit {
 		} else {
 			my $erstattung = 0;
 			$sperre = vorbereiten(1);
-			$sth = $dbh->prepare("SELECT wochentag, zeit, datum, bonus FROM termine WHERE user ='$id'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			$sth = $dbh->prepare("SELECT wochentag, zeit, datum, bonus FROM termine WHERE user ='$id'")|| die "Fehler bei der Datenverarbeitung! 872f375e $DBI::errstr\n";
 			$sth->execute();
 			while (@row = $sth->fetchrow_array()){
 				if (wieLangSchon($row[1],$row[2]) < 0) {
 					my $preis = getPreis($row[0], $row[1]);
 					$erstattung += $preis;
-					my $sth2 = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$id'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+					my $sth2 = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$id'")|| die "Fehler bei der Datenverarbeitung! 4e8d8ff3 $DBI::errstr\n";
 					$sth2->execute();
-					my $sth3 = $dbh->prepare("DELETE FROM termine WHERE user ='$id' AND datum = '$row[2]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+					my $sth3 = $dbh->prepare("DELETE FROM termine WHERE user ='$id' AND datum = '$row[2]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! 3b731f7a $DBI::errstr\n";
 					$sth3->execute();
 				}
 			}
@@ -1486,8 +1486,8 @@ sub do_edit {
 			printFehler("Passwort ge&auml;ndert!");
 		}
 		my $sql = "UPDATE users SET name='$name' , nachname='$nname' ,$change login='$login' , zimmer='$zimmer' , gesperrt=$sperre , message='$nachricht' , ip='$ip' , status='$status', bemerkung='$bemerkung' , von='$gId', termine='$termine' WHERE id='$id'";
-		$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
-		$sth->execute() || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! f04e09aa $DBI::errstr\n";
+		$sth->execute() || die "Fehler bei der Datenverarbeitung! 5b94b8a6 $DBI::errstr\n";
 		printFehler("Der User wurde erfolgreich ge&auml;ndert!");
 	} else {
 		gibEditForm($id, encode("utf-8", $login), encode("utf-8", $name), encode("utf-8", $nname), $status, $zimmer, $ip, $sperre, encode("utf-8", $nachricht), encode("utf-8", $bemerkung));
@@ -1501,7 +1501,7 @@ sub do_edit {
 sub manage_money {
 	if(sperrCheck()==1) { return; }
 	my $id = $cgi->url_param('id');
-	my $sth = $dbh->prepare("SELECT login , name , nachname, status, zimmer FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT login , name , nachname, status, zimmer FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! 3522a215 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
 	my @row2;
@@ -1511,7 +1511,7 @@ sub manage_money {
 	normalTabellenZeile("black", "<b>Vorname</b>", $row[1]);
 	normalTabellenZeile("black", "<b>Nachname</b>", $row[2]);
 	normalTabellenZeile("black", "<b>Zimmer</b>", $row[4]);
-	$sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 7a005412 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	if (@row2 = $sth->fetchrow_array) {
 		normalTabellenZeile("black", "<b>aktuelles Guthaben</b>", printNumber($row2[0])." (+".printNumber($row2[1])." Bonus) Euro ");
@@ -1535,7 +1535,7 @@ sub manage_money {
 		normalTabellenZeile("black", "<b>Login</b>", $row[0]);
 		normalTabellenZeile("black", "<b>Vorname</b>", $row[1]);
 		normalTabellenZeile("black", "<b>Nachname</b>", $row[2]);
-		$sth = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! a96da2ec $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		if (@row = $sth->fetchrow_array()) {
 			normalTabellenZeile("black", "<b>aktuelles Guthaben</b>", printNumber($row[0])." Euro");
@@ -1555,7 +1555,7 @@ sub manage_money {
 	normalTabellenZeile("black", "<b>Login</b>", encode("utf-8", $gLogin));
 	normalTabellenZeile("black", "<b>Vorname</b>", encode("utf-8", $gName));
 	normalTabellenZeile("black", "<b>Nachname</b>", encode("utf-8", $gNname));
-	$sth = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! e20cf599 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	if (@row = $sth->fetchrow_array()) {
 		normalTabellenZeile("black", "<b>aktuelles Guthaben</b>", printNumber($row[0])." Euro");
@@ -1573,11 +1573,11 @@ sub admin_transaktion {
 	if(sperrCheck()==1) { return; }
 	my $id = $cgi->url_param('id');
 	my $betrag = $cgi->param('betrag');
-	my $sth = $dbh->prepare("SELECT name, nachname, zimmer FROM users WHERE id='$id'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT name, nachname, zimmer FROM users WHERE id='$id'")|| die "Fehler bei der Datenverarbeitung! f47b91aa $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if ($betrag < 0) {
-		$sth = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user=$id ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 58633780 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		my @row3 = $sth->fetchrow_array();
 		if ($row3[0] < (-1)*$betrag) {
@@ -1616,7 +1616,7 @@ sub storno {
 		return;
 	}
 	my $betrag = $cgi->param('betrag');
-	my $sth = $dbh->prepare("SELECT MAX(preis) from preise")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT MAX(preis) from preise")|| die "Fehler bei der Datenverarbeitung! eeef16c2 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if(isNumeric($betrag) == 0) {
@@ -1650,7 +1650,7 @@ sub geldbewegung {
 	my $bestand;
 	my $bonusbestand;
 	my $bestandsDatum;
-	my $sth = $dbh->prepare("SELECT bestand, datum, bonus FROM finanzlog WHERE user='$user' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT bestand, datum, bonus FROM finanzlog WHERE user='$user' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! e728e264 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
 	if ($row[0] ne '') {
@@ -1663,16 +1663,16 @@ sub geldbewegung {
 	$bonusbestand = $bonus + $row[2];
 	if( $row[2] eq '') { $bonusbestand = $bonus; }
 	# vermeidet "doppelte Zeiten"
-	$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! e404af25 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	while ($bestandsDatum eq $row[0]) {
 		sleep(1);
-		$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! 98cdc977 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 	}
 	# ENDE vermeidet "doppelte Zeiten"
-	$sth = $dbh->prepare("INSERT INTO finanzlog VALUES ('$user', '$bestand', '$betrag', '$zweck', NOW(), '$bonusbestand')")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
-	$sth->execute()|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor;
+	$sth = $dbh->prepare("INSERT INTO finanzlog VALUES ('$user', '$bestand', '$betrag', '$zweck', NOW(), '$bonusbestand')")|| die "Fehler bei der Datenverarbeitung! 7300f1ec $DBI::errstr\n";	# bereitet den befehl vor
+	$sth->execute()|| die "Fehler bei der Datenverarbeitung! 1cf33174 $DBI::errstr\n";	# bereitet den befehl vor;
 }
 
 # vermerkt Transaktionen für Waschag-Mitglieder
@@ -1684,7 +1684,7 @@ sub quittung {
 	#my $datum = gibDatumZeitString(0);
 	my $bestand;
 	my $bestandsDatum;
-	my $sth = $dbh->prepare("SELECT bestand, datum FROM waschagtransaktionen WHERE user='$user' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT bestand, datum FROM waschagtransaktionen WHERE user='$user' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 68eae67f $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
 	if ($row[0] ne '') {
@@ -1695,15 +1695,15 @@ sub quittung {
 		$bestandsDatum = "0000-00-00 00:00:00";
 	}
 	# vermeidet "doppelte Zeiten"
-	$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! e404af25 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	while ($bestandsDatum eq $row[0]) {
 		sleep(1);
-		$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT NOW()")|| die "Fehler bei der Datenverarbeitung! 98cdc977 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 	}
 	# ENDE vermeidet "doppelte Zeiten"
-	$sth = $dbh->prepare("INSERT INTO waschagtransaktionen VALUES ('$user', '$bestand', '$betrag', '$zweck', NOW())")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("INSERT INTO waschagtransaktionen VALUES ('$user', '$bestand', '$betrag', '$zweck', NOW())")|| die "Fehler bei der Datenverarbeitung! 8d7b389b $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 }
 
@@ -1741,11 +1741,11 @@ sub ueberweisung {
 	} elsif ($betrag == 0) {
 		printFehler("Du m&uuml;llst unsere Datenbank nicht zu, nein DU NICHT! ;-)");
 	} else {
-		$sth = $dbh->prepare("SELECT id, name, nachname FROM users WHERE login=$empfang")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT id, name, nachname FROM users WHERE login=$empfang")|| die "Fehler bei der Datenverarbeitung! 4da576bf $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		if (@row = $sth->fetchrow_array()) {
 			my $id = $row[0];
-			$sth = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+			$sth = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 304bef30 $DBI::errstr\n";	# bereitet den befehl vor
 			$sth->execute();
 			if (@row2 = $sth->fetchrow_array()) {
 				if ($row2[0] >= $betrag){
@@ -1771,7 +1771,7 @@ sub god_transaktion {
 	my $betrag = $cgi->param('betrag');
 	my $zweck = makeclean($cgi->param('zweck'));
 	$zweck = makeclean($zweck);
-	my $sth = $dbh->prepare("SELECT name, nachname FROM users WHERE id='$id'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT name, nachname FROM users WHERE id='$id'")|| die "Fehler bei der Datenverarbeitung! f97ffbcd $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
 	if (isNumeric($betrag) == 1){
@@ -1803,7 +1803,7 @@ sub self_transaktion {
 # ----- KONTOFÜHRUNG -----
 
 sub kontoAuszug {
-	my $sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand, bonus FROM finanzlog WHERE user='$gId' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand, bonus FROM finanzlog WHERE user='$gId' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! e961c8d3 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row;
 	if (@row = $sth->fetchrow_array) {
@@ -1830,7 +1830,7 @@ sub kontoAuszug {
 		print "</th></tr></table><br><br>";
 	}
 	if($gStatus >= $waschag) {
-		$sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand FROM waschagtransaktionen WHERE user='$gId' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT datum, bemerkung, aktion, bestand FROM waschagtransaktionen WHERE user='$gId' ORDER BY datum ASC")|| die "Fehler bei der Datenverarbeitung! 561947e9 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		my @row;
 		if (@row = $sth->fetchrow_array) {
@@ -1869,26 +1869,26 @@ sub kontoAuszug {
 #gibt dolle Statistiken aus
 sub statistik {
 	# wie viele User
-	my $sth = $dbh->prepare("SELECT count(*) FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT count(*) FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! 46ebadea $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row;
 	@row = $sth->fetchrow_array();
 	my $anzahlLeute = $row[0];
 
 	# heute online gewesen
-	$sth = $dbh->prepare("SELECT count(*) FROM users WHERE status < $god AND lastlogin=DATE(NOW())")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT count(*) FROM users WHERE status < $god AND lastlogin=DATE(NOW())")|| die "Fehler bei der Datenverarbeitung! f976ce2d $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	@row = $sth->fetchrow_array();
 	my $anzahlOnline = int($row[0]);
 
 	# Sperren
-	$sth = $dbh->prepare("SELECT count(*) FROM users WHERE status < $god AND gesperrt = 1")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT count(*) FROM users WHERE status < $god AND gesperrt = 1")|| die "Fehler bei der Datenverarbeitung! 442ef2c0 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	@row = $sth->fetchrow_array();
 	my $anzahlSperre = int($row[0]);
 
 	# Etagenverteilung
-	$sth = $dbh->prepare("SELECT zimmer FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT zimmer FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! b7c9b3ce $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @etage;
 	for (my $i = 1; $i <= 15; $i++) {
@@ -1900,13 +1900,13 @@ sub statistik {
 	}
 
 	# wie viele Termine
-	$sth = $dbh->prepare("SELECT count(*) FROM termine")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT count(*) FROM termine")|| die "Fehler bei der Datenverarbeitung! 4309d4a8 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	@row = $sth->fetchrow_array();
 	my $anzahlTermine = $row[0];
 
 	# wie viele Termine
-	$sth = $dbh->prepare("SELECT count(*) FROM termine WHERE wochentag = 8")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT count(*) FROM termine WHERE wochentag = 8")|| die "Fehler bei der Datenverarbeitung! 31869031 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	@row = $sth->fetchrow_array();
 	my $anzahlGoodTermine = $row[0];
@@ -1916,7 +1916,7 @@ sub statistik {
 	for (my $i = 1; $i <= 15; $i++) {
 		$etagenGeld[$i] = 0;
 	}
-	$sth = $dbh->prepare("SELECT id, zimmer FROM users WHERE status < $waschag")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT id, zimmer FROM users WHERE status < $waschag")|| die "Fehler bei der Datenverarbeitung! e281cc11 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my $sth2;
 	my @row2;
@@ -1924,7 +1924,7 @@ sub statistik {
 	my $waschFinanz = 0;
 	while (@row = $sth->fetchrow_array()) {
 		my $temp = ($row[1] - $row[1]%100)/100;
-		$sth2 = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user=$row[0] ORDER BY datum DESC LIMIT 1")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth2 = $dbh->prepare("SELECT bestand FROM finanzlog WHERE user=$row[0] ORDER BY datum DESC LIMIT 1")|| die "Fehler bei der Datenverarbeitung! 2b801d57 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth2->execute();
 		@row2 = $sth2->fetchrow_array();
 		$etagenGeld[$temp] += $row2[0];
@@ -1932,11 +1932,11 @@ sub statistik {
 	}
 
 	# Geld bei den Nutzern und der AG
-	$sth = $dbh->prepare("SELECT id FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("SELECT id FROM users WHERE status < $god")|| die "Fehler bei der Datenverarbeitung! 6c749a6f $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	$waschFinanz = 0;
 	while (@row = $sth->fetchrow_array()) {
-		$sth2 = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$row[0] ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth2 = $dbh->prepare("SELECT bestand FROM waschagtransaktionen WHERE user=$row[0] ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 03955d97 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth2->execute();
 		@row2 = $sth2->fetchrow_array();
 		$waschFinanz += $row2[0];
@@ -1974,7 +1974,7 @@ sub statistik {
 sub look_banned_people {
 	if(sperrCheck()==1) { return; }
 	my $sortierung = $cgi->url_param('sort');
-	my $sth = $dbh->prepare("SELECT id, nachname, name, login, zimmer, bemerkung, lastlogin, ip FROM users WHERE gesperrt=1 ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT id, nachname, name, login, zimmer, bemerkung, lastlogin, ip FROM users WHERE gesperrt=1 ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! 28b1c633 $DBI::errstr\n";
 	$sth->execute();
 	my @row;
 	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
@@ -2005,7 +2005,7 @@ sub notifyVerwaltung {
 	if(sperrCheck()==1) { return; }
 	#holen der Daten
 	$sortierung = $cgi->url_param('sort');
-	my $sth = $dbh->prepare("SELECT id, (SELECT nachname FROM users where id=notify.id), (SELECT name FROM users where id=notify.id), ziel, datum FROM notify ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT id, (SELECT nachname FROM users where id=notify.id), (SELECT name FROM users where id=notify.id), ziel, datum FROM notify ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! 50eaa714 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();	# führt den befehl aus
 	my @row;
 	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
@@ -2029,7 +2029,7 @@ sub notifyVerwaltung {
 sub maschinenVerwaltung {
 	if(sperrCheck()==1) { return; }
 	#holen der Daten
-	my $sth = $dbh->prepare("SELECT id, status, bemerkung, (SELECT nachname FROM users where id=waschmaschinen.von), (SELECT name FROM users where id=waschmaschinen.von) FROM waschmaschinen")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT id, status, bemerkung, (SELECT nachname FROM users where id=waschmaschinen.von), (SELECT name FROM users where id=waschmaschinen.von) FROM waschmaschinen")||die "Fehler bei der Datenverarbeitung! b8898758 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();	# führt den befehl aus
 	my @row;
 	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
@@ -2057,7 +2057,7 @@ sub maschinenVerwaltung {
 	}
 	print "</table><br><br><br>";
 	if ($gStatus >= $god) {
-		$sth = $dbh->prepare("SELECT zweck FROM config ORDER BY zweck ASC")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT zweck FROM config ORDER BY zweck ASC")||die "Fehler bei der Datenverarbeitung! 5c3c0b2f $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();	# führt den befehl aus
 		my @contents;
 		my @werte;
@@ -2067,7 +2067,7 @@ sub maschinenVerwaltung {
 			$contents[$i] = $row[0];
 			$i++;
 		}
-		$sth = $dbh->prepare("SELECT wert FROM config ORDER BY zweck ASC")||die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("SELECT wert FROM config ORDER BY zweck ASC")||die "Fehler bei der Datenverarbeitung! 00131487 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();	# führt den befehl aus
 		normalTabellenZeileKopf("black", @contents);
 		print "<form action=\"$skript?aktion=set_config\" method=\"post\">";
@@ -2107,21 +2107,21 @@ sub maschineSetConfig {
 		$betrieb = vorbereiten(0);
 		my $erstattung = 0;
 		#$sperre = vorbereiten(1);
-		my $sth = $dbh->prepare("SELECT wochentag, zeit, user, datum FROM termine WHERE maschine ='$W_Id' AND wochentag != 8")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		my $sth = $dbh->prepare("SELECT wochentag, zeit, user, datum FROM termine WHERE maschine ='$W_Id' AND wochentag != 8")|| die "Fehler bei der Datenverarbeitung! e459b35f $DBI::errstr\n";
 		$sth->execute();
 		while (@row = $sth->fetchrow_array()){
 			if (wieLangNoch($row[1],$row[3]) > 0) {
 				for(my $i = 1; $i <= $anzahlMaschinen && $verschoben == 0; $i++) {
 					if($i != $W_Id) {
-						my $sql = $dbh->prepare("SELECT * FROM termine WHERE maschine = '$i' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+						my $sql = $dbh->prepare("SELECT * FROM termine WHERE maschine = '$i' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! cac4ed57 $DBI::errstr\n";
 			  		$sql->execute();
 			  		my @row2 = $sql->fetchrow_array();
 			  		if(scalar(@row2) == 0) {
-			  			$sql = $dbh->prepare("SELECT status FROM waschmaschinen WHERE id = '$i'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			  			$sql = $dbh->prepare("SELECT status FROM waschmaschinen WHERE id = '$i'")|| die "Fehler bei der Datenverarbeitung! 687641ec $DBI::errstr\n";
 			  			$sql->execute();
 			  			@row2 = $sql->fetchrow_array();
 			  			if ($row2[0] == 1){
-			  				my $sql = $dbh->prepare("UPDATE termine SET maschine='$i' WHERE maschine = '$W_Id' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			  				my $sql = $dbh->prepare("UPDATE termine SET maschine='$i' WHERE maschine = '$W_Id' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! f8a8a11f $DBI::errstr\n";
 			  		  	$sql->execute();
 			  		  	benachrichtige($row[2], "Ein Termin von dir wurde auf eine andere Maschine verlegt. Bitte beachten!");
 			  		  	$verschoben = 1;
@@ -2133,20 +2133,20 @@ sub maschineSetConfig {
 		  		my $preis = getPreis($row[0], $row[1]);
 					geldbewegung($row[2], $preis, "Erstattung wegen Terminausfalls (Sperrung Maschine $W_Id)");
 					benachrichtige($row[2], "Ein Termin von dir wurde storniert. Bitte beachten!");
-					my $sth2 = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$row[2]'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+					my $sth2 = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$row[2]'")|| die "Fehler bei der Datenverarbeitung! baf624c1 $DBI::errstr\n";
 					$sth2->execute();
 					sleep(1);
 				} else {
 					$verschoben = 0;
 				}
-				my $sth2 = $dbh->prepare("DELETE FROM termine WHERE maschine ='$W_Id' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+				my $sth2 = $dbh->prepare("DELETE FROM termine WHERE maschine ='$W_Id' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! 74f8fe8a $DBI::errstr\n";
 				$sth2->execute();
 			}
 		}
 	}
 	my $sql = "UPDATE waschmaschinen SET status=$betrieb , bemerkung='$bemerkung' , von='$gId' WHERE id=$W_Id";
-	my $sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
-	$sth->execute() || die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! 2ec5b678 $DBI::errstr\n";
+	$sth->execute() || die "Fehler bei der Datenverarbeitung! 1db0fe42 $DBI::errstr\n";
 	printFehler("Waschmaschinenstatus aktualisiert!");
 	$dbh->disconnect;
 }
@@ -2172,21 +2172,21 @@ sub set_config {
 		$ok = 0;
 	}
 	if ($ok == 1) {
-		my $sth = $dbh->prepare("UPDATE config SET wert='$storn' WHERE zweck='Stornierzeit (in Min)'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		my $sth = $dbh->prepare("UPDATE config SET wert='$storn' WHERE zweck='Stornierzeit (in Min)'")|| die "Fehler bei der Datenverarbeitung! 05ac6013 $DBI::errstr\n";
 		$sth->execute();
-		$sth = $dbh->prepare("UPDATE config SET wert='$antritt' WHERE zweck='Antrittszeit (in Min)'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE config SET wert='$antritt' WHERE zweck='Antrittszeit (in Min)'")|| die "Fehler bei der Datenverarbeitung! e5f0bbdd $DBI::errstr\n";
 		$sth->execute();
-		$sth = $dbh->prepare("UPDATE config SET wert='$relais' WHERE zweck='Relaiszeit (in Min)'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE config SET wert='$relais' WHERE zweck='Relaiszeit (in Min)'")|| die "Fehler bei der Datenverarbeitung! 62f87e75 $DBI::errstr\n";
 		$sth->execute();
-		$sth = $dbh->prepare("UPDATE config SET wert='$miniGeld' WHERE zweck='minimaler Einzahlbetrag (in Euro)'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE config SET wert='$miniGeld' WHERE zweck='minimaler Einzahlbetrag (in Euro)'")|| die "Fehler bei der Datenverarbeitung! d2329ed9 $DBI::errstr\n";
 		$sth->execute();
-		$sth = $dbh->prepare("UPDATE config SET wert='$tProMonat' WHERE zweck='Termine pro Monat'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE config SET wert='$tProMonat' WHERE zweck='Termine pro Monat'")|| die "Fehler bei der Datenverarbeitung! 0189bce2 $DBI::errstr\n";
 		$sth->execute();
-		$sth = $dbh->prepare("UPDATE config SET wert='$freigeld' WHERE zweck='Freigeld fuer WaschAG'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE config SET wert='$freigeld' WHERE zweck='Freigeld fuer WaschAG'")|| die "Fehler bei der Datenverarbeitung! bd00d998 $DBI::errstr\n";
 		$sth->execute();
-		$sth = $dbh->prepare("UPDATE config SET wert='$vorhalte' WHERE zweck='Vorhaltezeit Kontodaten (in Monaten)'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE config SET wert='$vorhalte' WHERE zweck='Vorhaltezeit Kontodaten (in Monaten)'")|| die "Fehler bei der Datenverarbeitung! 72dee743 $DBI::errstr\n";
 		$sth->execute();
-		$sth = $dbh->prepare("UPDATE config SET wert='$WAGvorhalte' WHERE zweck='Vorhaltezeit WAG-Kontodaten (in Monaten)'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE config SET wert='$WAGvorhalte' WHERE zweck='Vorhaltezeit WAG-Kontodaten (in Monaten)'")|| die "Fehler bei der Datenverarbeitung! 7a0a380a $DBI::errstr\n";
 		$sth->execute();
 		printFehler("Konfiguration aktualisiert.");
 	} else {
@@ -2207,7 +2207,7 @@ sub preisListe {
 	print "<tr><th>Zeit</th><th>Montag</th><th>Dienstag</th><th>Mittwoch</th><th>Donnerstag</th><th>Freitag</th><th>Samstag</th><th>Sonntag</th></tr>";
 	for (my $i = 0; $i <= 15; $i++) {
 		print "<tr><th>".gibWaschTermin($i)."</th>";
-		my $sth = $dbh->prepare("SELECT preis FROM preise WHERE zeit = '$i'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		my $sth = $dbh->prepare("SELECT preis FROM preise WHERE zeit = '$i'")|| die "Fehler bei der Datenverarbeitung! 552f6898 $DBI::errstr\n";
 		$sth->execute();
 		for (my $k = 0; $k <= 6; $k++) {
 			@row = $sth->fetchrow_array();
@@ -2243,7 +2243,7 @@ sub set_preis {
 	if ($ok == 1) {
 		for (my $i = 0; $i <= 15; $i++) {
 			for (my $k = 0; $k <= 6; $k++) {
-				my $sth = $dbh->prepare("UPDATE preise SET preis='$preis[$k][$i]' WHERE zeit = '$i' AND tag = '$k'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+				my $sth = $dbh->prepare("UPDATE preise SET preis='$preis[$k][$i]' WHERE zeit = '$i' AND tag = '$k'")|| die "Fehler bei der Datenverarbeitung! 746dd429 $DBI::errstr\n";
 				$sth->execute();
 			}
 		}
@@ -2263,7 +2263,7 @@ sub set_einheits_preis {
 		$ok = 0;
 	}
 	if ($ok == 1) {
-		my $sth = $dbh->prepare("UPDATE preise SET preis='$preis'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		my $sth = $dbh->prepare("UPDATE preise SET preis='$preis'")|| die "Fehler bei der Datenverarbeitung! d8e0db7f $DBI::errstr\n";
 		$sth->execute();
 		printFehler("Preise ge&auml;ndert.");
 	} else {
@@ -2276,7 +2276,7 @@ sub getPreis {
 	if(sperrCheck()==1) { return; }
 	my $tag = shift;
 	my $zeit = shift;
-	my $sth = $dbh->prepare("SELECT preis FROM preise WHERE tag = ".gibTag($tag)." AND zeit = '$zeit'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT preis FROM preise WHERE tag = ".gibTag($tag)." AND zeit = '$zeit'")|| die "Fehler bei der Datenverarbeitung! 243fe67f $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	return ($row[0]);
@@ -2297,7 +2297,7 @@ sub look_termine {
 	my @row2;
 	my $sth2;
 	# ermittelt Status der Maschinen
-	my $sth = $dbh->prepare("SELECT status FROM waschmaschinen ORDER BY id ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT status FROM waschmaschinen ORDER BY id ASC")|| die "Fehler bei der Datenverarbeitung! 3f0e7f61 $DBI::errstr\n";
 	$sth->execute();
 	my @maschine;
 	for (my $count = 0; my @m0 = $sth->fetchrow_array(); $count++) {
@@ -2318,7 +2318,7 @@ sub look_termine {
 		for (my $k = 0; $k <= 6; $k++) {
 			print "\n<td align=\"center\">";
 			my $datum = gibDatumString($k);
-			$sth = $dbh->prepare("SELECT user, zeit, maschine, datum, wochentag FROM termine WHERE zeit = '$i' AND datum = '$datum' ORDER BY maschine ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			$sth = $dbh->prepare("SELECT user, zeit, maschine, datum, wochentag FROM termine WHERE zeit = '$i' AND datum = '$datum' ORDER BY maschine ASC")|| die "Fehler bei der Datenverarbeitung! 6f2e5d6e $DBI::errstr\n";
 			$sth->execute();
 			@row = $sth->fetchrow_array();
 			# Unterscheidung ob Maschine defekt, Termin vergeben oder Termin frei und buchbar
@@ -2328,7 +2328,7 @@ sub look_termine {
 						if (($l+1) ne $row[2]) {
 							print "<font color=\"#ff0000\">vorbei</font>";
 						} else {
-							$sth2 = $dbh->prepare("SELECT zimmer FROM users WHERE id = '$row[0]'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+							$sth2 = $dbh->prepare("SELECT zimmer FROM users WHERE id = '$row[0]'")|| die "Fehler bei der Datenverarbeitung! ab74449b $DBI::errstr\n";
 							$sth2->execute();
 							@row2 = $sth2->fetchrow_array();
 							if ($row[4] == 8) {
@@ -2344,7 +2344,7 @@ sub look_termine {
 						} elsif (($l+1) ne $row[2]) {
 							print "<a class=\"green\" href=\"$skript?aktion=buchen&maschine=".($l+1)."&datum=$k&zeit=$i&confirm=no\">M".($l+1)." buchen</a>";
 						} else {
-							$sth2 = $dbh->prepare("SELECT zimmer FROM users WHERE id = '$row[0]'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+							$sth2 = $dbh->prepare("SELECT zimmer FROM users WHERE id = '$row[0]'")|| die "Fehler bei der Datenverarbeitung! ab74449b $DBI::errstr\n";
 							$sth2->execute();
 							@row2 = $sth2->fetchrow_array();
 							print "<b><font color=\"#9d5029\">".sprintf("%04d",$row2[0])."</b>";
@@ -2436,9 +2436,9 @@ sub bucheTermin {
 			if (wieLangSchon($zeit,$datum) < 0) {
 				my $res = geldAbbuchen($preis, $datum, $zeit, $tag);
 				if ($res > 0) {
-					$sth = $dbh->prepare("INSERT INTO termine VALUES ('$gId', '$zeit', '$maschine', '$datum', '".gibTag($tag)."', ".(($res == 1)?0:1).")")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+					$sth = $dbh->prepare("INSERT INTO termine VALUES ('$gId', '$zeit', '$maschine', '$datum', '".gibTag($tag)."', ".(($res == 1)?0:1).")")|| die "Fehler bei der Datenverarbeitung! 3671094d $DBI::errstr\n";
 					$sth->execute();
-					$sth = $dbh->prepare("UPDATE users SET termine = termine + 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+					$sth = $dbh->prepare("UPDATE users SET termine = termine + 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! b3279258 $DBI::errstr\n";
 					$sth->execute();
 					printFehler("Termin erfolgreich gebucht!");
 					return;
@@ -2465,7 +2465,7 @@ sub geldAbbuchen {
 	my $datum = shift;
 	my $zeit = shift;
 	my $tag = shift;
-	my $sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE user='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE user='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 17468c1f $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if($row[1] >= $preis) {
@@ -2485,7 +2485,7 @@ sub checkeTermin {
 	my $maschine = shift;
 	my $datum = shift;
 	my $zeit = shift;
-	my $sth = $dbh->prepare("SELECT * FROM termine WHERE maschine = '$maschine' AND datum = '$datum' AND zeit = '$zeit'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT * FROM termine WHERE maschine = '$maschine' AND datum = '$datum' AND zeit = '$zeit'")|| die "Fehler bei der Datenverarbeitung! 61c06feb $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if (scalar(@row) != 0){
@@ -2499,7 +2499,7 @@ sub checkeTermin {
 sub TagTerminZahlUeberschritten {
 	my $datum = shift;
 	my $count;
-	$sth = $dbh->prepare("SELECT * FROM termine WHERE datum = '$datum' AND user = '$gId'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("SELECT * FROM termine WHERE datum = '$datum' AND user = '$gId'")|| die "Fehler bei der Datenverarbeitung! de14ec67 $DBI::errstr\n";
 	$sth->execute();
 	$count = 0;
 	if ($gStatus == $god) {
@@ -2522,7 +2522,7 @@ sub MonatTerminZahlUeberschritten {
 	if ($gStatus == $god) {
 		return (0);
 	}
-	$sth = $dbh->prepare("SELECT termine FROM users WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("SELECT termine FROM users WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! 9295d3d8 $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if ($row[0] >= $termPerMonth) {
@@ -2538,7 +2538,7 @@ sub stornieren {
 	$datum = shift;
 	$zeit = shift;
 	$maschine = shift;
-	my $sth = $dbh->prepare("SELECT user, wochentag, bonus FROM termine WHERE datum = '$datum' AND zeit = '$zeit' AND maschine = '$maschine'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT user, wochentag, bonus FROM termine WHERE datum = '$datum' AND zeit = '$zeit' AND maschine = '$maschine'")|| die "Fehler bei der Datenverarbeitung! 5e6d81b4 $DBI::errstr\n";
 	$sth->execute();
 	if(my @row = $sth->fetchrow_array()){
 		if($row[0] == $gId){
@@ -2555,9 +2555,9 @@ sub stornieren {
 					$preis = 0;
 				}
 				geldbewegung($gId, $preis, "Termin am ".gibTagTextOhneOffset($row[1]).", $datum um ".gibWaschTermin($zeit)." Uhr storniert", $bonuspreis);
-				$sth = $dbh->prepare("DELETE FROM termine WHERE datum = '$datum' AND zeit = '$zeit' AND maschine = '$maschine'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+				$sth = $dbh->prepare("DELETE FROM termine WHERE datum = '$datum' AND zeit = '$zeit' AND maschine = '$maschine'")|| die "Fehler bei der Datenverarbeitung! 339978b9 $DBI::errstr\n";
 				$sth->execute();
-				$sth = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+				$sth = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! a83ee287 $DBI::errstr\n";
 				$sth->execute();
 			}
 		} else {
@@ -2578,7 +2578,7 @@ sub stornieren {
 sub show_doku {
 	my $sprache = shift;
 	my $listtype = "ul";
-	my $sth = $dbh->prepare("SELECT paragraph, abschnitt, satz, titel FROM doku_$sprache ORDER BY paragraph ASC, abschnitt ASC, satz ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT paragraph, abschnitt, satz, titel FROM doku_$sprache ORDER BY paragraph ASC, abschnitt ASC, satz ASC")|| die "Fehler bei der Datenverarbeitung! 84fb912a $DBI::errstr\n";
 	my $paragraph = 0;
 	my $abschnitt = 0;
 	my $satz = 0;
@@ -2625,7 +2625,7 @@ sub show_doku {
 	}
 	print "</$listtype>\n<br><br>";
 
-	$sth = $dbh->prepare("SELECT paragraph, abschnitt, satz, titel, inhalt FROM doku_$sprache ORDER BY paragraph ASC, abschnitt ASC, satz ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("SELECT paragraph, abschnitt, satz, titel, inhalt FROM doku_$sprache ORDER BY paragraph ASC, abschnitt ASC, satz ASC")|| die "Fehler bei der Datenverarbeitung! f521f6b7 $DBI::errstr\n";
 	$paragraph = 0;
 	$abschnitt = 0;
 	$satz = 0;
@@ -2684,7 +2684,7 @@ sub edit_doku {
 	if(sperrCheck()==1) { return; }
 	my $sprache = shift;
 	my $listtype = "ul";
-	my $sth = $dbh->prepare("SELECT paragraph, abschnitt, satz, titel FROM doku_$sprache ORDER BY paragraph ASC, abschnitt ASC, satz ASC")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT paragraph, abschnitt, satz, titel FROM doku_$sprache ORDER BY paragraph ASC, abschnitt ASC, satz ASC")|| die "Fehler bei der Datenverarbeitung! 84fb912a $DBI::errstr\n";
 	my $paragraph = 0;
 	my $abschnitt = 0;
 	my $satz = 0;
@@ -2764,7 +2764,7 @@ sub edit_this_doku {
 	my $paragraph = shift;
 	my $abschnitt = shift;
 	my $satz = shift;
-	my $sth = $dbh->prepare("SELECT titel, inhalt FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT titel, inhalt FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! 18d6961c $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	print "<form action=\"$skript?aktion=write_doku&lang=$sprache&p=$paragraph&a=$abschnitt&s=$satz\" method=\"post\">";
@@ -2781,7 +2781,7 @@ sub write_doku {
 	my $satz = shift;
 	my $titel = $cgi->param('titel');
 	my $inhalt = $cgi->param('inhalt');
-	my $sth = $dbh->prepare("UPDATE doku_$sprache SET titel = '$titel', inhalt = '$inhalt' WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	my $sth = $dbh->prepare("UPDATE doku_$sprache SET titel = '$titel', inhalt = '$inhalt' WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! 029480db $DBI::errstr\n";
 	$sth->execute();
 	printFehler("Daten gespeichert!");
 }
@@ -2796,7 +2796,7 @@ sub del_doku {
 	my $sth;
 	my @row;
 	if ($abschnitt == 0) {
-		$sth = $dbh->prepare("SELECT * FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt > '0' AND satz > '0'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT * FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt > '0' AND satz > '0'")|| die "Fehler bei der Datenverarbeitung! ecc94455 $DBI::errstr\n";
 		$sth->execute();
 		@row = $sth->fetchrow_array();
 		if (scalar(@row) != 0) {
@@ -2804,7 +2804,7 @@ sub del_doku {
 			return;
 		}
 	} elsif ($satz == 0) {
-		$sth = $dbh->prepare("SELECT * FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz > '0'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("SELECT * FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz > '0'")|| die "Fehler bei der Datenverarbeitung! 9a20f4ff $DBI::errstr\n";
 		$sth->execute();
 		@row = $sth->fetchrow_array();
 		if (scalar(@row) != 0) {
@@ -2812,7 +2812,7 @@ sub del_doku {
 			return;
 		}
 	}
-	$sth = $dbh->prepare("SELECT * FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("SELECT * FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! 5028bf28 $DBI::errstr\n";
 	$sth->execute();
 	@row = $sth->fetchrow_array();
 	if (scalar(@row) == 0) {
@@ -2820,7 +2820,7 @@ sub del_doku {
 		return;
 	}
 
-	$sth = $dbh->prepare("SELECT titel FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("SELECT titel FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! ef0f25bd $DBI::errstr\n";
 	$sth->execute();
 	@row = $sth->fetchrow_array();
 
@@ -2828,14 +2828,14 @@ sub del_doku {
 		print "<a href=\"$skript?aktion=del_doku&sure=yes&lang=$sprache&p=$paragraph&a=$abschnitt&s=$satz\">";
 		print "Dieser Link l&ouml;scht ".print_chapter($paragraph,$abschnitt,$satz)." $row[0] endg&uuml;ltig!</a>";
 	} else {
-		$sth = $dbh->prepare("DELETE FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("DELETE FROM doku_$sprache WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz = '$satz'")|| die "Fehler bei der Datenverarbeitung! dc647ff5 $DBI::errstr\n";
 		$sth->execute();
 		if ($satz != 0) {
-			$sth = $dbh->prepare("UPDATE doku_$sprache SET satz = satz-1 WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz > '$satz'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			$sth = $dbh->prepare("UPDATE doku_$sprache SET satz = satz-1 WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz > '$satz'")|| die "Fehler bei der Datenverarbeitung! c99ee0e3 $DBI::errstr\n";
 		} elsif ($abschnitt != 0) {
-			$sth = $dbh->prepare("UPDATE doku_$sprache SET abschnitt = abschnitt-1 WHERE paragraph = '$paragraph' AND abschnitt > '$abschnitt'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			$sth = $dbh->prepare("UPDATE doku_$sprache SET abschnitt = abschnitt-1 WHERE paragraph = '$paragraph' AND abschnitt > '$abschnitt'")|| die "Fehler bei der Datenverarbeitung! 8c40bc54 $DBI::errstr\n";
 		} else {
-			$sth = $dbh->prepare("UPDATE doku_$sprache SET paragraph = paragraph-1 WHERE paragraph > '$paragraph'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+			$sth = $dbh->prepare("UPDATE doku_$sprache SET paragraph = paragraph-1 WHERE paragraph > '$paragraph'")|| die "Fehler bei der Datenverarbeitung! 6550659e $DBI::errstr\n";
 		}
 		$sth->execute();
 		printFehler("L&ouml;schen beendet.");
@@ -2851,14 +2851,14 @@ sub new_doku {
 	my $satz = shift;
 	my $sth;
 	if ($satz != 0) {
-		$sth = $dbh->prepare("UPDATE doku_$sprache SET satz = satz+1 WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz >= '$satz'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE doku_$sprache SET satz = satz+1 WHERE paragraph = '$paragraph' AND abschnitt = '$abschnitt' AND satz >= '$satz'")|| die "Fehler bei der Datenverarbeitung! 9a6734c3 $DBI::errstr\n";
 	} elsif ($abschnitt != 0) {
-		$sth = $dbh->prepare("UPDATE doku_$sprache SET abschnitt = abschnitt+1 WHERE paragraph = '$paragraph' AND abschnitt >= '$abschnitt'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE doku_$sprache SET abschnitt = abschnitt+1 WHERE paragraph = '$paragraph' AND abschnitt >= '$abschnitt'")|| die "Fehler bei der Datenverarbeitung! 39c577d5 $DBI::errstr\n";
 	} else {
-		$sth = $dbh->prepare("UPDATE doku_$sprache SET paragraph = paragraph+1 WHERE paragraph >= '$paragraph'")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+		$sth = $dbh->prepare("UPDATE doku_$sprache SET paragraph = paragraph+1 WHERE paragraph >= '$paragraph'")|| die "Fehler bei der Datenverarbeitung! 08969a7c $DBI::errstr\n";
 	}
 	$sth->execute();
-	$sth = $dbh->prepare("INSERT INTO doku_$sprache VALUES ('$paragraph', '$abschnitt', '$satz', 'Titel', 'Text')")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";
+	$sth = $dbh->prepare("INSERT INTO doku_$sprache VALUES ('$paragraph', '$abschnitt', '$satz', 'Titel', 'Text')")|| die "Fehler bei der Datenverarbeitung! c7a22ec4 $DBI::errstr\n";
 	$sth->execute();
 	edit_this_doku($sprache, $paragraph, $abschnitt, $satz);
 }
@@ -2943,10 +2943,10 @@ sub create_shout {
 sub massenNachricht {
 	my $nachricht = $cgi->param('message');
 	my $nachricht = "<br>".encode("utf-8", $nachricht);
-	my $sth = $dbh->prepare("update users set message = CONCAT(message, '$nachricht') where status < $waschag;")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("update users set message = CONCAT(message, '$nachricht') where status < $waschag;")|| die "Fehler bei der Datenverarbeitung! 082276be $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	$nachricht = $nachricht." by $gName $gNname";
-	$sth = $dbh->prepare("update users set message = CONCAT(message, '$nachricht') where status >= $waschag;")|| die "Fehler bei der Datenverarbeitung! $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("update users set message = CONCAT(message, '$nachricht') where status >= $waschag;")|| die "Fehler bei der Datenverarbeitung! bd36ff17 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	printFehler("Nachricht erfolgreich versendet!");
 }
