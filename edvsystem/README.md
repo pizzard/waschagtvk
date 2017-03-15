@@ -27,3 +27,5 @@ Finally run
 sudo a2enmod cgi
 sudo service apache2 restart
 ```
+
+For the system to get actually functional, the database also needs to be setup with the credentials configured in the [inc/config.ini](inc/config.ini) beforehand. The [setup.sql](../setup.sql) script might be useful for testing.
