@@ -1950,25 +1950,34 @@ sub statistik {
 	print "Davon wurden bereits <b>$anzahlGoodTermine</b> Termin(e) wahrgenommen.<br><br>";
 	print "<b>Finanzstatistiken</b><br>";
 	print "Die Barschaft der Wasch-AG bel&auml;uft sich auf stolze <b>$waschFinanz Euro</b>.<br>";
-	print "Alle User besitzen zusammen <b>$finanzSumme Euro</b>.<br>Damit besitzt jeder im Durchschnitt <b>".((int($finanzSumme/$anzahlLeute * 100))/100)." Euro</b>.<br>";
-	print "<br><b>Und nun alle Etagen im Vergleich:</b>";
-	print "<table border=\"0\" align=\"center\" cellspacing=\"10\" cellpadding=\"6\"><tr align=\"center\"><th>Etage</th><th>|</th><th>User</th><th>prozentual</th><th>|</th><th>Kapital</th><th>prozentual</th><th>pro User</th><th>Anteil vom Durchschnitt</th></tr>";
-	my $anteil;
-	my $prozAnteil;
-	my $wohnprozent;
-	for (my $i = 1; $i <= 15; $i++) {
-		$wohnprozent = (int($etage[$i]/$anzahlLeute * 10000))/100;
-		$prozent = (int($etagenGeld[$i]/$finanzSumme * 10000))/100;
-		if ($etage[$i] == 0) {
-			$anteil = 0;
-			$prozAnteil = 0;
-		} else {
-			$anteil = (int($etagenGeld[$i]/$etage[$i] * 100))/100;
-			$prozAnteil = (int($anteil/($finanzSumme/$anzahlLeute) * 10000))/100;
+	print "Alle User besitzen zusammen <b>$finanzSumme Euro</b>.<br>";
+	if (anzahlLeute > 0) {
+		print "Damit besitzt jeder im Durchschnitt <b>".((int($finanzSumme/$anzahlLeute * 100))/100)." Euro</b>.<br>";
+		print "<br><b>Und nun alle Etagen im Vergleich:</b>";
+		print "<table border=\"0\" align=\"center\" cellspacing=\"10\" cellpadding=\"6\"><tr align=\"center\"><th>Etage</th><th>|</th><th>User</th><th>prozentual</th><th>|</th><th>Kapital</th><th>prozentual</th><th>pro User</th><th>Anteil vom Durchschnitt</th></tr>";
+		my $anteil;
+		my $prozAnteil;
+		my $wohnprozent;
+		for (my $i = 1; $i <= 15; $i++) {
+			$wohnprozent = (int($etage[$i]/$anzahlLeute * 10000))/100;
+			if ($finanzSumme > 0) {
+				$prozent = (int($etagenGeld[$i]/$finanzSumme * 10000))/100;
+				if ($etage[$i] == 0) {
+					$anteil = 0;
+					$prozAnteil = 0;
+				} else {
+					$anteil = (int($etagenGeld[$i]/$etage[$i] * 100))/100;
+					$prozAnteil = (int($anteil/($finanzSumme/$anzahlLeute) * 10000))/100;
+				}
+			} else {
+				$prozent = "N/A";
+				$anteil = "N/A";
+				$prozAnteil = "N/A";
+			}
+			print "<tr align=\"center\"><td>".$i."te</td><td></td><td>$etage[$i]</td><td>$wohnprozent %</td><td></td><td>$etagenGeld[$i]</td><td>$prozent %</td><td>$anteil</td><td>$prozAnteil %</td></tr>";
 		}
-		print "<tr align=\"center\"><td>".$i."te</td><td></td><td>$etage[$i]</td><td>$wohnprozent %</td><td></td><td>$etagenGeld[$i]</td><td>$prozent %</td><td>$anteil</td><td>$prozAnteil %</td></tr>";
+		print "</table>";
 	}
-	print "</table>";
 }
 
 sub look_banned_people {
