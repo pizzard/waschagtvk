@@ -671,12 +671,18 @@ sub print_header {
           my @file = <START>;
           print @file;
      close (START);
+     print "<head>";
+     print "<title>$progName</title>";
      print "<style type=\"text/css\">";
 		 print "a.red {color: #FF0000}";
 		 print "a.yellow {color: #FFFF00}";
 		 print "a.green {color:#008f00}";
 		 print "a.green:hover {color:#ff9900}";
 		 print "</style>";
+     print "<!-- Latest compiled and minified CSS -->";
+     print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">';
+     print "</head>";
+	print "<body>";
 }
 
 # Fu  jeder Seite, GegenstÃ¼ck zu print_header
@@ -684,6 +690,7 @@ sub print_footer {
 	print "<br><br><br><table width=\"100%\" frame=\"above\" cellpadding=\"1\">";
 	print "<tr><td align=\"left\"> $progName $version</td><td align=\"right\">by $godsName </td></tr>";
 	print "<tr><td colspan=2><b>(1)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
+	print "</body>";
      open (ENDE, "/var/www/start.inc");
           my @file = <ENDE>;
           print @file;
@@ -695,7 +702,7 @@ sub print_footer {
 # param Titel
 sub Titel {
 	my $titel = shift;
-	print "<table><tr><th  colspan=\"2\" align=\"left\">Hallo $gName $gNname, willkommen im $progName : $titel</th></tr>";
+	print "<h1 class=\"page-header\">Hallo $gName $gNname, willkommen im $progName : $titel</h1>";
 	my $sth;
 	my @row;
 	if ($titel ne "Login") {
@@ -706,7 +713,7 @@ sub Titel {
 			$bestand = $row[0];
 			$bonus = $row[1];
 		}
-		print "<tr><td colspan=\"2\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(1)</sup>.</td></tr>";
+		print "<div class=\"alert alert-info\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(1)</sup>.</div>";
 	}
 }
 
@@ -737,6 +744,38 @@ sub kopf {
 		our $gSperre = decode("utf-8", $row[5]);
 		our $gLogin = decode("utf-8", $row[6]);
 		print_header();
+		# Menüleisten nach Benutzerstatus
+		if ($gStatus >= $user) {
+			print "<div class=\"navbar navbar-default\">";
+			print "<div class=\"navbar-header\"><a class=\"navbar-brand\" href=\"$skript?aktion=index\">$progName</a></div>";
+			print "<ul class=\"nav navbar-nav\">";
+			print "<li><a href=\"$skript?aktion=look_termine\">Termin buchen</a></li>";
+			print "<li><a href=\"$skript?aktion=kontoauszug\">Kontoauszug</a></li>";
+			print "<li><a href=\"$skript?aktion=ueberweisungsformular\">&Uuml;berweisung anlegen</a></li>";
+			print "<li><a href=\"$skript?aktion=change_pw\">Passwort &auml;ndern</a></li>";
+			print "</ul><div class=\"navbar-left\">";
+			print "<div>Hilfe ansehen</div>";
+			print "<div class=\"btn-group btn-group-xs\" role=\"group\"><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=ger\">Deutsch</a><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=eng\">Englisch</a></div>";
+			print "</div></div>";
+			}
+		if ($gStatus >= $waschag){
+			print "<ul class=\"nav nav-tabs\">";
+			print "<li><a href=\"$skript?aktion=new_user\">Neuen User erstellen</a></li>";
+			print "<li><a href=\"$skript?aktion=user_management&sort=id%20ASC\">Userverwaltung</a></li>";
+			if ($gStatus >= $god) {
+				print "<li><a href=\"$skript?aktion=preisliste\">Preisverwaltung</a></li>";
+			}
+			print "<li><a href=\"$skript?aktion=waschmaschinen\">Waschmaschinenverwaltung und Konfiguration</a></li>";
+			print "</ul><ul class=\"nav nav-tabs\">";
+			print "<li><a href=\"$skript?aktion=notify_management&sort=id%20ASC\">Firewall-<br>Logfile</a></li>";
+			print "<li><a href=\"$skript?aktion=stats\">Statistik</a></li>";
+			if ($gStatus >= $god) {
+				print "<li><div>Hilfe bearbeiten</div><div class=\"btn-group btn-group-xs\" role=\"group\"><a class=\"btn btn-default\" href=\"$skript?aktion=edit_doku&lang=ger\">Deutsch</a><a class=\"btn btn-default\" href=\"$skript?aktion=edit_doku&lang=eng\">Englisch</a></div></li>";
+			}
+			print "<li><a href=\"$skript?aktion=look_old_data&dir=./logs&file=.\">Alte Daten ansehen</a></li>";
+			print "<li><a href=\"$skript?aktion=create_shout\">Massennachricht<br>versenden</a></li>";
+			print "</ul>";
+		}
 		if (($wartung && $gStatus < $waschag) || ($godWartung && $gStatus < $god)) {
 			Titel("Wartungsarbeiten");
 			printFehler("<br><br>Momentan werden Wartungsarbeiten am System durchgef&uuml;hrt. Habe bitte ein bisschen Geduld!");
@@ -792,35 +831,6 @@ sub kopf {
 			Titel("Logbuch");
 		} elsif ($anliegen eq "shout") {
 			Titel("Massennachricht");
-		}
-		# Menüleisten nach Benutzerstatus
-		if ($gStatus >= $user) {
-			print "<table cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
-			print "<tr><td align=\"center\"><a href=\"$skript?aktion=index\">Willkommensseite</a></td>";
-			print "<td align=\"center\"><a href=\"$skript?aktion=look_termine\">Termin buchen</a></td>";
-			print "<td align=\"center\"><a href=\"$skript?aktion=kontoauszug\">Kontoauszug</a></td>";
-			print "<td align=\"center\"><a href=\"$skript?aktion=ueberweisungsformular\">&Uuml;berweisung anlegen</a></td>";
-			print "<td align=\"center\"><a href=\"$skript?aktion=change_pw\">Passwort &auml;ndern</a></td>";
-			print "<td align=\"center\">Hilfe ansehen<br><a href=\"$skript?aktion=show_doku&lang=ger\">Deutsch</a>/<a href=\"$skript?aktion=show_doku&lang=eng\">Englisch</a></td>";
-			print "</tr></table>";
-			}
-		if ($gStatus >= $waschag){
-			print "<table cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
-			print "<tr><td align=\"center\"><a href=\"$skript?aktion=new_user\">Neuen User erstellen</a></td>";
-			print "<td align=\"center\"><a href=\"$skript?aktion=user_management&sort=id%20ASC\">Userverwaltung</a></td>";
-			if ($gStatus >= $god) {
-				print "<td align=\"center\"><a href=\"$skript?aktion=preisliste\">Preisverwaltung</a></td>";
-			}
-			print "<td align=\"center\"><a href=\"$skript?aktion=waschmaschinen\">Waschmaschinenverwaltung und Konfiguration</a></td>";
-			print "</table><table cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
-			print "</tr><tr><td align=\"center\"><a href=\"$skript?aktion=notify_management&sort=id%20ASC\">Firewall-<br>Logfile</a></td>";
-			print "<td align=\"center\"><a href=\"$skript?aktion=stats\">Statistik</a></td>";
-			if ($gStatus >= $god) {
-				print "<td align=\"center\">Hilfe bearbeiten<br><a href=\"$skript?aktion=edit_doku&lang=ger\">Deutsch</a>/<a href=\"$skript?aktion=edit_doku&lang=eng\">Englisch</a></td>";
-			}
-			print "<td align=\"center\"><a href=\"$skript?aktion=look_old_data&dir=./logs&file=.\">Alte Daten ansehen</a></td>";
-			print "<td align=\"center\"><a href=\"$skript?aktion=create_shout\">Massennachricht<br>versenden</a></td>";
-			print "</tr></table>";
 		}
 	}
 	getConfig();
@@ -910,10 +920,10 @@ sub logon {
 		printFehler($error);
 		$error = '';
 	}
-	print "<form action=\"$skript?aktion=login\" method=\"post\">";
-	print "<table style='border: 0px;'><tr><td>Login:</td><td><input name=\"login\" size=\"40\" value=\"$login\"></td></tr>";
-	print "<tr><td>Passwort:</td><td><input name=\"pw\" type=\"password\" size=\"40\"></td></tr></table><br>";
-	print "<input type=\"submit\" value=\"Einloggen\"></form>";
+	print "<form action=\"$skript?aktion=login\" method=\"post\" class=\"well well-lg col-md-4 col-md-offset-4\">";
+	print "<div class=\"input-group\"><label for=\"login\" class=\"input-group-addon\">Login:</label><input class=\"form-control\" name=\"login\" size=\"40\" value=\"$login\" /></div><br/>";
+	print "<div class=\"input-group\"><label for=\"pw\" class=\"input-group-addon\">Passwort:</label><input class=\"form-control\" name=\"pw\" type=\"password\" size=\"40\" /></div><br/>";
+	print "<input class=\"btn btn-primary\" type=\"submit\" value=\"Einloggen\" /></form>";
 }
 
 # prüft die beim Login eingegebenen Werte und setzt die Cookies
@@ -1242,7 +1252,7 @@ ENDE_DES_STRINGS
 	my $sth = $dbh->prepare("SELECT id, nachname, name, login, zimmer, gesperrt, status, lastlogin, ip FROM users WHERE ".$zimmer_add." ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! 7bab9f6d $DBI::errstr\n";
 	$sth->execute();
 	my @row;
-	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+	print "<table class=\"table table-condensed table-striped\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 	my $zimmerinfos = "&zimmer=".$zimmernummer."&etage=".$etagennummer;
 	normalTabellenZeileKopf("black",
 								"id<br><a href=\"$skript?aktion=user_management&sort=id%20ASC".$zimmerinfos."\">&lt;</a><a href=\"$skript?aktion=user_management&sort=id%20DESC".$zimmerinfos."\">&gt;</a>",
@@ -1954,7 +1964,7 @@ sub statistik {
 	if (anzahlLeute > 0) {
 		print "Damit besitzt jeder im Durchschnitt <b>".((int($finanzSumme/$anzahlLeute * 100))/100)." Euro</b>.<br>";
 		print "<br><b>Und nun alle Etagen im Vergleich:</b>";
-		print "<table border=\"0\" align=\"center\" cellspacing=\"10\" cellpadding=\"6\"><tr align=\"center\"><th>Etage</th><th>|</th><th>User</th><th>prozentual</th><th>|</th><th>Kapital</th><th>prozentual</th><th>pro User</th><th>Anteil vom Durchschnitt</th></tr>";
+		print "<table class=\"table table-condensed table-striped\" border=\"0\" align=\"center\" cellspacing=\"10\" cellpadding=\"6\"><tr align=\"center\"><th>Etage</th><th>|</th><th>User</th><th>prozentual</th><th>|</th><th>Kapital</th><th>prozentual</th><th>pro User</th><th>Anteil vom Durchschnitt</th></tr>";
 		my $anteil;
 		my $prozAnteil;
 		my $wohnprozent;
@@ -1986,7 +1996,7 @@ sub look_banned_people {
 	my $sth = $dbh->prepare("SELECT id, nachname, name, login, zimmer, bemerkung, lastlogin, ip FROM users WHERE gesperrt=1 ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! 4e05ae9e $DBI::errstr\n";
 	$sth->execute();
 	my @row;
-	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+	print "<table class=\"table table-condensed table-striped\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 	#print "<colgroup>
 	normalTabellenZeileKopf("black",
 								"id<br><a href=\"$skript?aktion=look_banned_poopies&sort=id%20ASC\">&lt;</a><a href=\"$skript?aktion=look_banned_poopies&sort=id%20DESC\">&gt;</a>",
@@ -2017,7 +2027,7 @@ sub notifyVerwaltung {
 	my $sth = $dbh->prepare("SELECT id, (SELECT nachname FROM users where id=notify.id), (SELECT name FROM users where id=notify.id), ziel, datum FROM notify ORDER BY $sortierung")||die "Fehler bei der Datenverarbeitung! 97525389 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();	# führt den befehl aus
 	my @row;
-	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+	print "<table class=\"table table-condensed table-striped\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 	normalTabellenZeileKopf("black",
 								"User id<br><a href=\"$skript?aktion=notify_management&sort=id%20ASC\">&lt;</a> <a href=\"$skript?aktion=notify_management&sort=id%20DESC\">&gt;</a>",
 								"Zugriffsversuch auf<br><a href=\"$skript?aktion=notify_management&sort=ziel%20ASC\">&lt;</a> <a href=\"$skript?aktion=notify_management&sort=ziel%20DESC\">&gt;</a>",
@@ -2213,7 +2223,8 @@ sub preisListe {
 
 	print "<form action=\"$skript?aktion=set_preis\" method=\"post\">";
 	print "<table cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
-	print "<tr><th>Zeit</th><th>Montag</th><th>Dienstag</th><th>Mittwoch</th><th>Donnerstag</th><th>Freitag</th><th>Samstag</th><th>Sonntag</th></tr>";
+	print "<tbody class=\"panel panel-default\">";
+	print "<tr class=\"panel-heading\"><th>Zeit</th><th>Montag</th><th>Dienstag</th><th>Mittwoch</th><th>Donnerstag</th><th>Freitag</th><th>Samstag</th><th>Sonntag</th></tr>";
 	for (my $i = 0; $i <= 15; $i++) {
 		print "<tr><th>".gibWaschTermin($i)."</th>";
 		my $sth = $dbh->prepare("SELECT preis FROM preise WHERE zeit = '$i'")|| die "Fehler bei der Datenverarbeitung! aa1595c0 $DBI::errstr\n";
@@ -2224,6 +2235,7 @@ sub preisListe {
 		}
 		print "</tr>";
 	}
+	print "</tbody>";
 	print "</table><br><p><input type=\"submit\" value=\"Preise &auml;ndern\"></p></form>";
 }
 
@@ -2317,7 +2329,8 @@ sub look_termine {
 	print "<table cellspacing=\"10\" cellpadding=\"0\" width=\"100%\"><colgroup>";
 	print "<col width=\"9%\"><col width=\"13%\"><col width=\"13%\"><col width=\"13%\">";
 	print "<col width=\"13%\"><col width=\"13%\"><col width=\"13%\"><col width=\"13%\">";
-	print "<tr><th>Zeit</th>";
+	print "<tbody class=\"panel panel-default\">";
+	print "<tr class=\"panel-heading\"><th>Zeit</th>";
 	for (my $i = 0; $i <= 6; $i++) {
 		print "<th align=\"center\">".gibTagText($i)."</th>";
 	}
@@ -2387,12 +2400,12 @@ sub look_termine {
 		}
 		print "</tr>";
 	}
-	print "<tr><th>Zeit</th>";
+	print "<tr class=\"panel-footer\"><th>Zeit</th>";
 	for (my $i = 0; $i <= 6; $i++) {
 		print "<th align=\"center\">".gibTagText($i)."</th>";
 	}
 	print "</tr>";
-	print "</table>";
+	print "</tbody></table>";
 }
 
 # Bucht einen Termin
