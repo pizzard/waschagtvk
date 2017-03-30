@@ -12,7 +12,7 @@ QT += core \
     widgets
    
     
-CONFIG += release
+CONFIG += release c++11
 
 # Input
 HEADERS += src/crypt.h \
@@ -29,4 +29,7 @@ SOURCES += src/WashingProgram.cpp \
     src/Hilfsfunktionen.cpp \
     src/relais.cpp \
     src/TerminVerwaltung.cpp
+
+FORMS += \
+    ente.ui
 
