@@ -11,6 +11,8 @@ use Config::IniFiles;
 use Digest::SHA qw(sha1_hex);
 #use Net::SFTP;
 
+use Dateutils;
+
 our $cgi = new CGI;	# erzeugt ein neues CGI-Objekt (damit formulare bearbeitet und HTML ausgegeben werden kann)
 our $skript = "wasch.cgi"; # Dateiname
 our $include = "inc/"; #Include-Verzeichnis
@@ -474,136 +476,6 @@ sub logout {
 	print $cgi->redirect(-URL=>"$skript", -cookie=>[$cLogin, $cPw]);
 }
 
-# gibt das aktuelle Datum + n Tage (als Parameter) im richtigen Format für MySQL zurück
-sub gibDatumString {
-	my $n = shift;
-	my @zeit = gibDatum($n);
-	my $monat;
-	my $tag;
-	if ($zeit[1] < 10) {
-		$monat = "0".$zeit[1];
-	} else {
-		$monat = $zeit[1];
-	}
-	if ($zeit[2] < 10) {
-		$tag = "0".$zeit[2];
-	} else {
-		$tag = $zeit[2];
-	}
-	return($zeit[0]."-".$monat."-".$tag);
-}
-
-
-# alte Funktion - NICHT BENUTZEN
-sub gibDatumZeitString {
-	my @jetzt = localtime();
-	return (gibDatumString(0)." ".$jetzt[2].":".$jetzt[1].":".$jetzt[0]);
-}
-
-
-# berechnet localtime + n Tage (als Parameter);
-sub gibDatum {
-	my $n = shift;
-	my @jetzt = localtime();
-	my @zeit;
-	my $monat;
-	$zeit[0] = 1900 + $jetzt[5];
-	$zeit[1] = $jetzt[4] + 1;
-	$zeit[2] = $jetzt[3];
-	do {
-		if ($zeit[1] == 1 || $zeit[1] == 3 || $zeit[1] == 5 || $zeit[1] == 7 || $zeit[1] == 8 || $zeit[1] == 10 || $zeit[1] == 12) {
-			$monat = 31;
-		} elsif ($zeit[1] == 2) {
-			if (($zeit[0] % 4 == 0 && $zeit[0] % 100 != 0) || $zeit[0] % 400 == 0){
-				$monat = 29;
-			} else {
-				$monat = 28;
-			}
-		} else {
-			$monat = 30;
-		}
-		if($n <= $monat - $zeit[2]){
-			$zeit[2] = $zeit[2] + $n;
-			$n = 0;
-		} else {
-			if ($zeit[1] == 12){
-				$zeit[0]++;
-				$zeit[1] = 1;
-			} else {
-				$zeit[1]++;
-			}
-			$n = $n - 1 - ($monat - $zeit[2]);
-			$zeit[2] = 1;
-		}
-	} until ($n == 0);
-	return (@zeit);
-}
-
-# berechnet localtime + n Tage (als Parameter) mit Stunden, Minuten, Sekunden;
-sub gibZeit {
-	my $n = shift;
-	my @zeit = gibDatum($n);
-	my @jetzt = localtime();
-	$zeit[3] = $jetzt[2];
-	$zeit[4] = $jetzt[1];
-	$zeit[5] = $jetzt[0];
-	return (@zeit);
-}
-
-# bestimmt den Wochentag von localtime + n Tage (als Parameter) und gibt seine Nummer zurück (Mo = 0 bis 6 = So)
-sub gibTag {
-	my $n = shift;
-	my @zeit = localtime();
-	my $dow = ($zeit[6] - 1 + $n) % 7;
-	return($dow);
-}
-
-# bestimmt den Wochentag von localtime + n Tage (als Parameter) und gibt seinen Namen zurück
-sub gibTagText {
-	my $n = shift;
-	my @zeit = localtime();
-	my $dow = ($zeit[6] - 1 + $n) % 7;
-	if ($dow == 0){
-		$dow = "Montag";
-	} elsif ($dow == 1){
-		$dow = "Dienstag";
-	} elsif ($dow == 2){
-		$dow = "Mittwoch";
-	} elsif ($dow == 3){
-		$dow = "Donnerstag";
-	} elsif ($dow == 4){
-		$dow = "Freitag";
-	} elsif ($dow == 5){
-		$dow = "Samstag";
-	} elsif ($dow == 6){
-		$dow = "Sonntag";
-	}
-	return($dow);
-}
-
-# bestimmt den Wochentag der Nummer n und gibt seinen Namen zurück
-sub gibTagTextOhneOffset {
-	my $dow = shift;
-	if ($dow == 0){
-		$dow = "Montag";
-	} elsif ($dow == 1){
-		$dow = "Dienstag";
-	} elsif ($dow == 2){
-		$dow = "Mittwoch";
-	} elsif ($dow == 3){
-		$dow = "Donnerstag";
-	} elsif ($dow == 4){
-		$dow = "Freitag";
-	} elsif ($dow == 5){
-		$dow = "Samstag";
-	} elsif ($dow == 6){
-		$dow = "Sonntag";
-	} elsif ($dow == 8){
-		$dow = "Wahrgenommen";
-	}
-	return($dow);
-}
-
 # gibt zurück, ob es sich um einen Float handelt
 sub isNumeric {
 	my $string = scalar(shift);
@@ -806,7 +678,7 @@ sub kopf {
 		# Überprüfung der Zugriffsrechte, ggf. Meldung einer Zugriffsverletzung an die DB
 		if ($gStatus < $neededStatus) {
 			printFehler ("Zugang zu Interna verweigert! Benachrichtigung an Admins versendet.<br><br>Weitere Zugriffsversuche werden geahndet!");
-			$sth = $dbh->prepare("INSERT INTO notify VALUES (".vorbereiten($gId).", ".vorbereiten($anliegen).", ".vorbereiten(gibDatumString(0)).")")|| die "Fehler bei der Datenverarbeitung! 12f7e543 $DBI::errstr\n";	# bereitet den befehl vor
+			$sth = $dbh->prepare("INSERT INTO notify VALUES (".vorbereiten($gId).", ".vorbereiten($anliegen).", ".vorbereiten(Dateutils::gibDatumString(0)).")")|| die "Fehler bei der Datenverarbeitung! 12f7e543 $DBI::errstr\n";	# bereitet den befehl vor
 			$sth->execute();	# führt den befehl aus
 			return (0);
 		}
@@ -974,7 +846,7 @@ sub firstLogin {
 	if (validate(vorbereiten($login), $pw) == 1){
 		$login = vorbereiten($login);
 		getConfig();
-		my $jetzt = gibDatumString(0);
+		my $jetzt = Dateutils::gibDatumString(0);
 		my $sth = $dbh->prepare("SELECT lastlogin FROM users WHERE login = $login")|| die "Fehler bei der Datenverarbeitung! d2eb2f52 $DBI::errstr\n";
 		$sth->execute();
 		my @row = $sth->fetchrow_array();
@@ -1041,7 +913,7 @@ sub hauptMenue {
 				if ($row[0] != 8) {
 					my $bonustermin = "";
 					if($row[4] != 0) { $bonustermin = "(Bonustermin)"; }
-					normalTabellenZeile("black", gibTagTextOhneOffset($row[0]), $row[1], gibWaschTermin($row[2])." Uhr", "Maschine ".$row[3]. " ".$bonustermin."<a href=\"$skript?aktion=index&storn=yes&datum=$row[1]&zeit=$row[2]&maschine=$row[3]\">stornieren</a>");
+					normalTabellenZeile("black", Dateutils::gibTagTextOhneOffset($row[0]), $row[1], gibWaschTermin($row[2])." Uhr", "Maschine ".$row[3]. " ".$bonustermin."<a href=\"$skript?aktion=index&storn=yes&datum=$row[1]&zeit=$row[2]&maschine=$row[3]\">stornieren</a>");
 				}
 			}
 			print "</table>";
@@ -1432,7 +1304,7 @@ sub gibEditForm {
 	my $bemerkung = decode("utf-8",shift);
 	my $termine = shift;
 	my $lastlogin = shift;
-	my $jetzt = gibDatumString(0);
+	my $jetzt = Dateutils::gibDatumString(0);
 
 
 	print "<form action=\"$skript?aktion=do_edit&id=$id\" method=\"post\">";
@@ -1697,7 +1569,7 @@ sub geldbewegung {
 	my $betrag = shift;
 	my $zweck = shift;
 	my $bonus = shift;
-	#my $datum = gibDatumZeitString(0);
+	#my $datum = Dateutils::gibDatumZeitString(0);
 	my $bestand;
 	my $bonusbestand;
 	my $bestandsDatum;
@@ -1732,7 +1604,7 @@ sub quittung {
 	my $user = shift;
 	my $betrag = shift;
 	my $zweck = shift;
-	#my $datum = gibDatumZeitString(0);
+	#my $datum = Dateutils::gibDatumZeitString(0);
 	my $bestand;
 	my $bestandsDatum;
 	my $sth = $dbh->prepare("SELECT bestand, datum FROM waschagtransaktionen WHERE user='$user' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! 96d94ef1 $DBI::errstr\n";	# bereitet den befehl vor
@@ -2338,7 +2210,7 @@ sub getPreis {
 	if(sperrCheck()==1) { return; }
 	my $tag = shift;
 	my $zeit = shift;
-	my $sth = $dbh->prepare("SELECT preis FROM preise WHERE tag = ".gibTag($tag)." AND zeit = '$zeit'")|| die "Fehler bei der Datenverarbeitung! 1ea81def $DBI::errstr\n";
+	my $sth = $dbh->prepare("SELECT preis FROM preise WHERE tag = ".Dateutils::gibTag($tag)." AND zeit = '$zeit'")|| die "Fehler bei der Datenverarbeitung! 1ea81def $DBI::errstr\n";
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	return ($row[0]);
@@ -2373,14 +2245,14 @@ sub look_termine {
 	print "<tbody class=\"panel panel-default\">";
 	print "<tr class=\"panel-heading\"><th>Zeit</th>";
 	for (my $i = 0; $i <= 6; $i++) {
-		print "<th style=\"text-align: center\">".gibTagText($i)."</th>";
+		print "<th style=\"text-align: center\">".Dateutils::gibTagText($i)."</th>";
 	}
 	print "</tr>";
 	for (my $i = 0; $i <= 15; $i++) {
 		print "\n<tr><th>".gibWaschTermin($i)."</th>";
 		for (my $k = 0; $k <= 6; $k++) {
 			print "\n<td style=\"text-align: center\">";
-			my $datum = gibDatumString($k);
+			my $datum = Dateutils::gibDatumString($k);
 			$sth = $dbh->prepare("SELECT user, zeit, maschine, datum, wochentag FROM termine WHERE zeit = '$i' AND datum = '$datum' ORDER BY maschine ASC")|| die "Fehler bei der Datenverarbeitung! 252a6d0c $DBI::errstr\n";
 			$sth->execute();
 			@row = $sth->fetchrow_array();
@@ -2442,7 +2314,7 @@ sub look_termine {
 	}
 	print "<tr class=\"panel-footer\"><th>Zeit</th>";
 	for (my $i = 0; $i <= 6; $i++) {
-		print "<th style=\"text-align: center\">".gibTagText($i)."</th>";
+		print "<th style=\"text-align: center\">".Dateutils::gibTagText($i)."</th>";
 	}
 	print "</tr>";
 	print "</tbody></table>";
@@ -2455,8 +2327,8 @@ sub bucheTermin {
 	my $zeit = $cgi->url_param('zeit');
 	my $confirm = $cgi->url_param('confirm');
 	my $tag = $cgi->url_param('datum');
-	my $datum = gibDatumString($tag);
-	my $wochentag = gibTag($tag);
+	my $datum = Dateutils::gibDatumString($tag);
+	my $wochentag = Dateutils::gibTag($tag);
 	my @row;
 
 	if ($tag > 6) {
@@ -2487,7 +2359,7 @@ sub bucheTermin {
 
 	if ($confirm ne 'yes') {
 		print "<a href=\"$skript?aktion=buchen&maschine=$maschine&datum=$tag&zeit=$zeit&confirm=yes\">";
-		print "Klicke hier um den folgenden Termin zu buchen<br><br>".gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr<br><br>";
+		print "Klicke hier um den folgenden Termin zu buchen<br><br>".Dateutils::gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr<br><br>";
 		print "Dabei werden von deinem Konto <b>$preis Euro</b> abgebucht.</a>";
 		return;
 	}
@@ -2498,11 +2370,11 @@ sub bucheTermin {
 			if (wieLangSchon($zeit,$datum) < 0) {
 				my $res = geldAbbuchen($preis, $datum, $zeit, $tag);
 				if ($res > 0) {
-					$sth = $dbh->prepare("INSERT INTO termine VALUES ('$gId', '$zeit', '$maschine', '$datum', '".gibTag($tag)."', ".(($res == 1)?0:1).")")|| die "Fehler bei der Datenverarbeitung! 0b0e1b1f $DBI::errstr\n";
+					$sth = $dbh->prepare("INSERT INTO termine VALUES ('$gId', '$zeit', '$maschine', '$datum', '".Dateutils::gibTag($tag)."', ".(($res == 1)?0:1).")")|| die "Fehler bei der Datenverarbeitung! 0b0e1b1f $DBI::errstr\n";
 					$sth->execute();
 					$sth = $dbh->prepare("UPDATE users SET termine = termine + 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! 80c5b139 $DBI::errstr\n";
 					$sth->execute();
-					my $bucheTermin_success_message = "<div class=\"row alert alert-success\"><div class=\"col-md-2\"><img src=\"//137.226.142.9/care-label.jpg\" alt=\"care label\" class=\"img-responsive\"></div><div class=\"col-md-10\"><h3>Termin erfolgreich gebucht!</h3><p>Dein Termin ist: ".gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr</p><p>Viel Spa&szlig; beim Waschen! <a href=\"http://www.clevercare.info/de/temperatur-0\" class=\"alert-link\">Mach dich schon mal schlau &uuml;ber W&auml;sche!</a></p><p>Noch Fragen? <a href=\"mailto:waschag\@tvk.rwth-aachen.de\" class=\"alert-link\">Schreib uns!</a></p></div></div>";
+					my $bucheTermin_success_message = "<div class=\"row alert alert-success\"><div class=\"col-md-2\"><img src=\"//137.226.142.9/care-label.jpg\" alt=\"care label\" class=\"img-responsive\"></div><div class=\"col-md-10\"><h3>Termin erfolgreich gebucht!</h3><p>Dein Termin ist: ".Dateutils::gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr</p><p>Viel Spa&szlig; beim Waschen! <a href=\"http://www.clevercare.info/de/temperatur-0\" class=\"alert-link\">Mach dich schon mal schlau &uuml;ber W&auml;sche!</a></p><p>Noch Fragen? <a href=\"mailto:waschag\@tvk.rwth-aachen.de\" class=\"alert-link\">Schreib uns!</a></p></div></div>";
 					printFehler($bucheTermin_success_message);
 					return;
 				} else {
@@ -2532,13 +2404,13 @@ sub geldAbbuchen {
 	$sth->execute();
 	my @row = $sth->fetchrow_array();
 	if($row[1] >= $preis) {
-		geldbewegung($gId, 0, "Buchung Waschtermin am ".gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr von Bonusguthaben", (-1)*$preis);
+		geldbewegung($gId, 0, "Buchung Waschtermin am ".Dateutils::gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr von Bonusguthaben", (-1)*$preis);
 		return (2);
 	}
 	if ($row[0] < $preis) {
 		return (0);
 	} else {
-		geldbewegung($gId, (-1)*$preis, "Buchung Waschtermin am ".gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr");
+		geldbewegung($gId, (-1)*$preis, "Buchung Waschtermin am ".Dateutils::gibTagText($tag).", $datum um ".gibWaschTermin($zeit)." Uhr");
 		return (1);
 	}
 }
@@ -2617,7 +2489,7 @@ sub stornieren {
 					$bonuspreis = $preis;
 					$preis = 0;
 				}
-				geldbewegung($gId, $preis, "Termin am ".gibTagTextOhneOffset($row[1]).", $datum um ".gibWaschTermin($zeit)." Uhr storniert", $bonuspreis);
+				geldbewegung($gId, $preis, "Termin am ".Dateutils::gibTagTextOhneOffset($row[1]).", $datum um ".gibWaschTermin($zeit)." Uhr storniert", $bonuspreis);
 				$sth = $dbh->prepare("DELETE FROM termine WHERE datum = '$datum' AND zeit = '$zeit' AND maschine = '$maschine'")|| die "Fehler bei der Datenverarbeitung! 7d8b8b3a $DBI::errstr\n";
 				$sth->execute();
 				$sth = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! 0878f8bd $DBI::errstr\n";
