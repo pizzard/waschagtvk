@@ -2332,13 +2332,13 @@ sub look_termine {
 	print "<tbody class=\"panel panel-default\">";
 	print "<tr class=\"panel-heading\"><th>Zeit</th>";
 	for (my $i = 0; $i <= 6; $i++) {
-		print "<th align=\"center\">".gibTagText($i)."</th>";
+		print "<th style=\"text-align: center\">".gibTagText($i)."</th>";
 	}
 	print "</tr>";
 	for (my $i = 0; $i <= 15; $i++) {
 		print "\n<tr><th>".gibWaschTermin($i)."</th>";
 		for (my $k = 0; $k <= 6; $k++) {
-			print "\n<td align=\"center\">";
+			print "\n<td style=\"text-align: center\">";
 			my $datum = gibDatumString($k);
 			$sth = $dbh->prepare("SELECT user, zeit, maschine, datum, wochentag FROM termine WHERE zeit = '$i' AND datum = '$datum' ORDER BY maschine ASC")|| die "Fehler bei der Datenverarbeitung! 252a6d0c $DBI::errstr\n";
 			$sth->execute();
@@ -2402,7 +2402,7 @@ sub look_termine {
 	}
 	print "<tr class=\"panel-footer\"><th>Zeit</th>";
 	for (my $i = 0; $i <= 6; $i++) {
-		print "<th align=\"center\">".gibTagText($i)."</th>";
+		print "<th style=\"text-align: center\">".gibTagText($i)."</th>";
 	}
 	print "</tr>";
 	print "</tbody></table>";
