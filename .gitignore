@@ -31,3 +31,5 @@
 .project
 .cproject
 
+# build dirs
+build/
