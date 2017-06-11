@@ -2267,9 +2267,16 @@ sub set_einheits_preis {
 		$ok = 0;
 	}
 	if ($ok == 1) {
-		my $sth = $dbh->prepare("UPDATE preise SET preis='$preis'")|| die "Fehler bei der Datenverarbeitung! 6aa94bd2 $DBI::errstr\n";
+		my $sth = $dbh->prepare("SELECT count(preise)")|| die "Fehler bei der Datenverarbeitung! 6aa94bd2 $DBI::errstr\n";
 		$sth->execute();
-		printFehler("Preise ge&auml;ndert.");
+		my @row = $sth->fetchrow_array();
+		if(scalar(@row[0]) == 0) {
+			printFehler("Error: Please first populate the preise table!");
+		} else {
+			my $sth = $dbh->prepare("UPDATE preise SET preis='$preis'")|| die "Fehler bei der Datenverarbeitung! 6aa94bd2 $DBI::errstr\n";
+			$sth->execute();
+			printFehler("Preise auf Einheitspreis $preis gesetzt.");
+		}
 	} else {
 		printFehler("Aktion abgebrochen!");
 	}
