@@ -1104,9 +1104,9 @@ sub create_user {
 		$sth = $dbh->prepare("SELECT MAX(id) FROM users")|| die "Fehler bei der Datenverarbeitung! a28aa67b $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute() || die "Fehler bei der Datenverarbeitung! f37067ad $DBI::errstr\n";
 		my @row = $sth->fetchrow_array();
-		$sth = $dbh->prepare("INSERT INTO finanzlog VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW(), '0')")|| die "Fehler bei der Datenverarbeitung! f8561970 $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("INSERT INTO finanzlog (`user`, bestand, aktion, bemerkung, datum, bonus) VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW(), '0')")|| die "Fehler bei der Datenverarbeitung! f8561970 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute() || die "Fehler bei der Datenverarbeitung! 59427184 $DBI::errstr\n";
-		$sth = $dbh->prepare("INSERT INTO waschagtransaktionen VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW())")|| die "Fehler bei der Datenverarbeitung! bd532050 $DBI::errstr\n";	# bereitet den befehl vor
+		$sth = $dbh->prepare("INSERT INTO waschagtransaktionen (`user`, bestand, aktion, bemerkung, datum) VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW())")|| die "Fehler bei der Datenverarbeitung! bd532050 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute() || die "Fehler bei der Datenverarbeitung! 114d51f4 $DBI::errstr\n";
 		$sth = $dbh->prepare("SELECT id FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! 15c981c4 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
@@ -1594,7 +1594,7 @@ sub geldbewegung {
 		$sth->execute();
 	}
 	# ENDE vermeidet "doppelte Zeiten"
-	$sth = $dbh->prepare("INSERT INTO finanzlog VALUES ('$user', '$bestand', '$betrag', '$zweck', NOW(), '$bonusbestand')")|| die "Fehler bei der Datenverarbeitung! 19fad5ee $DBI::errstr\n";	# bereitet den befehl vor
+	$sth = $dbh->prepare("INSERT INTO finanzlog (`user`, bestand, aktion, bemerkung, datum, bonus) VALUES ('$user', '$bestand', '$betrag', '$zweck', NOW(), '$bonusbestand')")|| die "Fehler bei der Datenverarbeitung! 19fad5ee $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute()|| die "Fehler bei der Datenverarbeitung! 820727d0 $DBI::errstr\n";	# bereitet den befehl vor;
 }
 
