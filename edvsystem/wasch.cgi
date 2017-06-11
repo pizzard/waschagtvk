@@ -2175,13 +2175,22 @@ sub set_preis {
 		}
 	}
 	if ($ok == 1) {
+		my $sth = $dbh->prepare("SELECT count(preise)")|| die "Fehler bei der Datenverarbeitung! 8df71d84 $DBI::errstr\n";
+		$sth->execute();
+		my @row = $sth->fetchrow_array();
+		my $need_setup = scalar(@row[0]) == 0;
+		my $each_query = ($need_setup
+			? "INSERT INTO preise (preis, zeit, tag) VALUES ('%d', '%d', '%d')"
+			: "UPDATE preise SET preis='%d' WHERE zeit = '%d' AND tag = '%d'"
+		);
 		for (my $i = 0; $i <= 15; $i++) {
 			for (my $k = 0; $k <= 6; $k++) {
-				my $sth = $dbh->prepare("UPDATE preise SET preis='$preis[$k][$i]' WHERE zeit = '$i' AND tag = '$k'")|| die "Fehler bei der Datenverarbeitung! 8df71d84 $DBI::errstr\n";
+				my $q = sprintf($each_query, $preis[$k][$i], $i, $k);
+				my $sth = $dbh->prepare($q)|| die "Fehler bei der Datenverarbeitung! 8df71d84 $DBI::errstr\n";
 				$sth->execute();
 			}
 		}
-		printFehler("Preise ge&auml;ndert.");
+		printFehler(($need_setup? "Preise-Tabelle angelegt, ": "")."Preise ge&auml;ndert.");
 	} else {
 		printFehler("Aktion abgebrochen!");
 	}
@@ -2197,7 +2206,7 @@ sub set_einheits_preis {
 		$ok = 0;
 	}
 	if ($ok == 1) {
-		my $sth = $dbh->prepare("SELECT count(preise)")|| die "Fehler bei der Datenverarbeitung! 6aa94bd2 $DBI::errstr\n";
+		my $sth = $dbh->prepare("SELECT count(preis) from preise")|| die "Fehler bei der Datenverarbeitung! 6aa94bd2 $DBI::errstr\n";
 		$sth->execute();
 		my @row = $sth->fetchrow_array();
 		if(scalar(@row[0]) == 0) {
