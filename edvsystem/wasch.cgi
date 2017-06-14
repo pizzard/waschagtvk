@@ -688,7 +688,7 @@ sub print_header {
 # Fu  jeder Seite, GegenstÃ¼ck zu print_header
 sub print_footer {
 	print "<br><br><br><table width=\"100%\" frame=\"above\" cellpadding=\"1\">";
-	print "<tr><td align=\"left\"> $progName $version</td><td align=\"right\">by $godsName </td></tr>";
+	print "<tr><td style=\"text-align: left\"> $progName $version</td><td style=\"text-align: right\">by $godsName </td></tr>";
 	print "<tr><td colspan=2><b>(1)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
 	print "</body>";
      open (ENDE, "/var/www/start.inc");
@@ -844,12 +844,12 @@ sub tabellenZeile {
 	my $farbe = shift;
 	my $id = $_[0];
 	foreach (@_) {
-		print "<td align=\"center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</td>";
+		print "<td style=\"text-align: center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</td>";
 	}
-	print "<td align=\"center\"><a href=\"$skript?aktion=edit_user&id=$id\">bearbeiten</a></td>";
-	print "<td align=\"center\"><a href=\"$skript?aktion=delete_user&id=$id\">l&ouml;schen</a></td>";
-	print "<td align=\"center\"><a href=\"$skript?aktion=manage_money&id=$id\">ein-\/auszahlen</a></td>";
-	print "<td align=\"center\"><a href=\"$skript?aktion=show_user_finance&id=$id\">Konto</a></td>";
+	print "<td style=\"text-align: center\"><a href=\"$skript?aktion=edit_user&id=$id\">bearbeiten</a></td>";
+	print "<td style=\"text-align: center\"><a href=\"$skript?aktion=delete_user&id=$id\">l&ouml;schen</a></td>";
+	print "<td style=\"text-align: center\"><a href=\"$skript?aktion=manage_money&id=$id\">ein-\/auszahlen</a></td>";
+	print "<td style=\"text-align: center\"><a href=\"$skript?aktion=show_user_finance&id=$id\">Konto</a></td>";
 	print "</tr>";
 }
 
@@ -861,15 +861,15 @@ sub BannedTabellenZeile {
 	my $counter = 0;
 	foreach (@_) {
 		if ($counter == $bemerkungsfeld) {
-			print "<td align=\"left\">"."<p align=\"justify\"><font color=\"$farbe\">".decode("utf-8", $_)."</font></p>"."</td>";
+			print "<td style=\"text-align: left\">"."<p style=\"text-align: justify\"><font color=\"$farbe\">".decode("utf-8", $_)."</font></p>"."</td>";
 		} else {
-			print "<td align=\"center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</td>";
+			print "<td style=\"text-align: center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</td>";
 		}
 		$counter++;
 	}
-	print "<td align=\"center\"><a href=\"$skript?aktion=edit_user&id=$id\">bearbeiten</a></td>";
-	print "<td align=\"center\"><a href=\"$skript?aktion=delete_user&id=$id\">l&ouml;schen</a></td>";
-	print "<td align=\"center\"><a href=\"$skript?aktion=show_user_finance&id=$id\">Konto</a></td>";
+	print "<td style=\"text-align: center\"><a href=\"$skript?aktion=edit_user&id=$id\">bearbeiten</a></td>";
+	print "<td style=\"text-align: center\"><a href=\"$skript?aktion=delete_user&id=$id\">l&ouml;schen</a></td>";
+	print "<td style=\"text-align: center\"><a href=\"$skript?aktion=show_user_finance&id=$id\">Konto</a></td>";
 	print "</tr>";
 }
 
@@ -879,7 +879,7 @@ sub normalTabellenZeile {
 	print "<tr>";
 	my $farbe = shift;
 	foreach (@_) {
-		print "<td align=\"center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</td>";
+		print "<td style=\"text-align: center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</td>";
 	}
 	print "</tr>";
 }
@@ -891,7 +891,7 @@ sub normalTabellenZeileKopf {
 	my $farbe = shift;
 	my $id = $_[0];
 	foreach (@_) {
-		print "<th align=\"center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</th>";
+		print "<th style=\"text-align: center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</th>";
 	}
 	print "</tr>";
 }
@@ -1964,7 +1964,7 @@ sub statistik {
 	if (anzahlLeute > 0) {
 		print "Damit besitzt jeder im Durchschnitt <b>".((int($finanzSumme/$anzahlLeute * 100))/100)." Euro</b>.<br>";
 		print "<br><b>Und nun alle Etagen im Vergleich:</b>";
-		print "<table class=\"table table-condensed table-striped\" border=\"0\" align=\"center\" cellspacing=\"10\" cellpadding=\"6\"><tr align=\"center\"><th>Etage</th><th>|</th><th>User</th><th>prozentual</th><th>|</th><th>Kapital</th><th>prozentual</th><th>pro User</th><th>Anteil vom Durchschnitt</th></tr>";
+		print "<table class=\"table table-condensed table-striped\" border=\"0\" style=\"text-align: center\" cellspacing=\"10\" cellpadding=\"6\"><tr style=\"text-align: center\"><th>Etage</th><th>|</th><th>User</th><th>prozentual</th><th>|</th><th>Kapital</th><th>prozentual</th><th>pro User</th><th>Anteil vom Durchschnitt</th></tr>";
 		my $anteil;
 		my $prozAnteil;
 		my $wohnprozent;
@@ -1984,7 +1984,7 @@ sub statistik {
 				$anteil = "N/A";
 				$prozAnteil = "N/A";
 			}
-			print "<tr align=\"center\"><td>".$i."te</td><td></td><td>$etage[$i]</td><td>$wohnprozent %</td><td></td><td>$etagenGeld[$i]</td><td>$prozent %</td><td>$anteil</td><td>$prozAnteil %</td></tr>";
+			print "<tr style=\"text-align: center\"><td>".$i."te</td><td></td><td>$etage[$i]</td><td>$wohnprozent %</td><td></td><td>$etagenGeld[$i]</td><td>$prozent %</td><td>$anteil</td><td>$prozAnteil %</td></tr>";
 		}
 		print "</table>";
 	}
@@ -2219,7 +2219,7 @@ sub preisListe {
 	my @row;
 	print "<table><tr>";
 	print "<form action=\"$skript?aktion=set_einheits_preis\" method=\"post\">";
-	print "<td align=\"center\">Einheitspreis auf&#160&#160&#160<input name=\"T\" size=\"4\"> Euro&#160&#160&#160<input type=\"submit\" value=\"setzen\"></td></tr></table></form>";
+	print "<td style=\"text-align: center\">Einheitspreis auf&#160&#160&#160<input name=\"T\" size=\"4\"> Euro&#160&#160&#160<input type=\"submit\" value=\"setzen\"></td></tr></table></form>";
 
 	print "<form action=\"$skript?aktion=set_preis\" method=\"post\">";
 	print "<table cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
@@ -2231,7 +2231,7 @@ sub preisListe {
 		$sth->execute();
 		for (my $k = 0; $k <= 6; $k++) {
 			@row = $sth->fetchrow_array();
-			print "<td align=\"center\"><input name=\"T$k$i\" size=\"4\" value=\"$row[0]\"> Euro</td>";
+			print "<td style=\"text-align: center\"><input name=\"T$k$i\" size=\"4\" value=\"$row[0]\"> Euro</td>";
 		}
 		print "</tr>";
 	}
@@ -2941,7 +2941,7 @@ sub look_old_data() {
 			my @line = split('\t', $tempstring);
 			print "<tr>";
 			foreach (@line) {
-				print "<td align=\"left\">$_</td>";
+				print "<td style=\"text-align: left\">$_</td>";
 			}
 			print "</tr>";
 		}
@@ -2957,7 +2957,7 @@ sub look_old_data() {
 
 sub create_shout {
 	print "<form action=\"$skript?aktion=send_shout\" method=\"post\">";
-	print "<p align=\"center\">Nachricht:<br><textarea name=\"message\" cols=\"80\" rows=\"10\">Hier Nachricht eingeben</textarea><br>";
+	print "<p style=\"text-align: center\">Nachricht:<br><textarea name=\"message\" cols=\"80\" rows=\"10\">Hier Nachricht eingeben</textarea><br>";
 	print "<input type=\"submit\" value=\"Abschicken\"></p></form>";
 }
 
