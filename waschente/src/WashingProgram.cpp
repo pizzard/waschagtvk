@@ -6,7 +6,7 @@ WashingProgram::WashingProgram(QWidget *parent):
 	QWidget(parent)
 {
 	ui.setupUi(this);
-	setMinimumSize(1280, 1024);
+	setMinimumSize(1280, 720);
 	setWindowState(Qt::WindowFullScreen);
-	setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+	// setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 }
