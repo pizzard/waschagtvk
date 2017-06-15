@@ -1298,7 +1298,7 @@ sub user_finance {
 		print "<br><table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\"><tr><th>";
 		print decode("utf-8", $name)." ".decode("utf-8", $nname).": Kontostand am ".substr($row[0],0,10)." um ".substr($row[0],11,8)." Uhr betrug ".printNumber($row[3])." Euro.";
 		print "</th></tr></table><br><br>";
-		print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+		print "<table class=\"table table-hover\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 		normalTabellenZeileKopf("black", "Datum", "Erl&auml;uterung", "Betrag<br>(Euro)", "Bestand nachher<br>(Euro)", "Bonus nachher<br>(Euro)");
 		while (@row = $sth->fetchrow_array){
 			@temp = @row;
@@ -1326,7 +1326,7 @@ sub user_finance {
 			print "----------------------------------------<br><br><br><br>";
 			print "$name $nname: Der WaschAG-Kontostand am ".substr($row[0],0,10)." um ".substr($row[0],11,8)." Uhr betrug ".printNumber($row[3])." Euro.";
 			print "</th></tr></table><br><br>";
-			print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+			print "<table class=\"table table-hover\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 			normalTabellenZeileKopf("black", "Datum", "Erl&auml;uterung", "Betrag<br>(Euro)", "Bestand nachher<br>(Euro)");
 			while (@row = $sth->fetchrow_array){
 				@temp = @row;
@@ -1821,7 +1821,7 @@ sub kontoAuszug {
 		print "<br><table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\"><tr><th>";
 		print "Dein Kontostand am ".substr($row[0],0,10)." um ".substr($row[0],11,8)." Uhr betrug ".printNumber($row[3])." (+".printNumber($row[4])." Bonus) Euro.";
 		print "</th></tr></table><br><br>";
-		print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+		print "<table class=\"table table-hover\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 		normalTabellenZeileKopf("black", "Datum", "Erl&auml;uterung", "Betrag<br>(Euro)", "Bestand nachher<br>(Euro)","Bonus nachher<br>(Euro)");
 		while (@row = $sth->fetchrow_array){
 			@temp = @row;
@@ -1849,7 +1849,7 @@ sub kontoAuszug {
 			print "----------------------------------------<br><br><br><br>";
 			print "Dein WaschAG-Kontostand am ".substr($row[0],0,10)." um ".substr($row[0],11,8)." Uhr betrug ".printNumber($row[3])." Euro.";
 			print "</th></tr></table><br><br>";
-			print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+			print "<table class=\"table table-hover\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 			normalTabellenZeileKopf("black", "Datum", "Erl&auml;uterung", "Betrag<br>(Euro)", "Bestand nachher<br>(Euro)");
 			while (@row = $sth->fetchrow_array){
 				@temp = @row;
@@ -2051,7 +2051,7 @@ sub maschinenVerwaltung {
 	my $sth = $dbh->prepare("SELECT id, status, bemerkung, (SELECT nachname FROM users where id=waschmaschinen.von), (SELECT name FROM users where id=waschmaschinen.von) FROM waschmaschinen")||die "Fehler bei der Datenverarbeitung! 25264373 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();	# führt den befehl aus
 	my @row;
-	print "<table cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
+	print "<table class=\"table\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 	normalTabellenZeileKopf("black",
 								"id",
 								"betriebsbereit",
@@ -2222,7 +2222,7 @@ sub preisListe {
 	print "<td style=\"text-align: center\">Einheitspreis auf&#160&#160&#160<input name=\"T\" size=\"4\"> Euro&#160&#160&#160<input type=\"submit\" value=\"setzen\"></td></tr></table></form>";
 
 	print "<form action=\"$skript?aktion=set_preis\" method=\"post\">";
-	print "<table cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
+	print "<table class=\"table table-hover\" cellspacing=\"10\" cellpadding=\"5\" width=\"100%\">";
 	print "<tbody class=\"panel panel-default\">";
 	print "<tr class=\"panel-heading\"><th>Zeit</th><th>Montag</th><th>Dienstag</th><th>Mittwoch</th><th>Donnerstag</th><th>Freitag</th><th>Samstag</th><th>Sonntag</th></tr>";
 	for (my $i = 0; $i <= 15; $i++) {
@@ -2326,7 +2326,7 @@ sub look_termine {
 	}
 	# Start Formular
 	print "Link f&uuml;r den iCal-Export aufs Smartphone: <a href=\"https://www.tvk.rwth-aachen.de/~waschag/terminexport.php?id=$terminhash\">https://www.tvk.rwth-aachen.de/~waschag/terminexport.php?id=$terminhash</a>";
-	print "<table cellspacing=\"10\" cellpadding=\"0\" width=\"100%\"><colgroup>";
+	print "<table class=\"table table-hover\" cellspacing=\"10\" cellpadding=\"0\" width=\"100%\"><colgroup>";
 	print "<col width=\"9%\"><col width=\"13%\"><col width=\"13%\"><col width=\"13%\">";
 	print "<col width=\"13%\"><col width=\"13%\"><col width=\"13%\"><col width=\"13%\">";
 	print "<tbody class=\"panel panel-default\">";
