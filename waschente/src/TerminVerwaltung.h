@@ -18,9 +18,9 @@
 #include "Hilfsfunktionen.h"
 
 // Server-Adresse DB
-#define SERVER "137.226.142.9"
+#define SERVER "localhost"
 // Passwort für die DB
-#define PWORT "Ariel42Rein:"
+#define PWORT "waschagpassword"
 // Username der DB
 #define USER "waschag"
 // WaschAG Status Identifier

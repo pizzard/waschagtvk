@@ -4,7 +4,7 @@
 
 struct 	termios oldtio, newtio ;
 int     	k8056_port ;
-char		k8056_device[16] = "/dev/ttyS0" ;	/*  This is the default device, can be reset on command line. */
+char		k8056_device[] = "/tmp/tty_fake_k8056" ;	/*  This is the default device, can be reset on command line. */
 unsigned char 	k8056_instruction = 'E';
 unsigned char 	k8056_addr = 1 ;
 unsigned char	k8056_relay_address = '0'  ;
