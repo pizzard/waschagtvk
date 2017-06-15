@@ -886,12 +886,29 @@ sub normalTabellenZeile {
 
 # Macht eine Tabellenzeile für die Titelzeile der Tabelle
 # param farbe, Zellen als Array (beginnend mit der id)
+#
+# farbe can instead be the reference to a hash containing "color"
+# and optionally "min-cols" entry to add a "fill-up" column at the end (right side)
 sub normalTabellenZeileKopf {
 	print "<tr>";
 	my $farbe = shift;
-	my $id = $_[0];
+	# my $id = $_[0];
+	my %options;
+	if ($farbe->{"color"}) {
+		%options = %$farbe;
+		$farbe = $options->{"color"};
+	}
+	my $existing_cols = $#_;
 	foreach (@_) {
 		print "<th style=\"text-align: center\">"."<font color=\"$farbe\">".decode("utf-8", $_)."</font>"."</th>";
+	}
+	if ($options{"min-cols"}) {
+		$remaining_cols = $options{"min-cols"} - $existing_cols;
+		if ($remaining_cols > 1) {
+			print "<th colspan=\"$remaining_cols\"></th>";
+		} elsif ($remaining_cols == 1) {
+			print "<th></th>";
+		}
 	}
 	print "</tr>";
 }
@@ -1254,7 +1271,8 @@ ENDE_DES_STRINGS
 	my @row;
 	print "<table class=\"table table-condensed table-striped\" cellspacing=\"5\" cellpadding=\"3\" width=\"100%\">";
 	my $zimmerinfos = "&zimmer=".$zimmernummer."&etage=".$etagennummer;
-	normalTabellenZeileKopf("black",
+	my %normalTabellenZeile_options = ("color"=> "black", "min-cols"=>13);
+	normalTabellenZeileKopf(\%normalTabellenZeile_options,
 								"id<br><a href=\"$skript?aktion=user_management&sort=id%20ASC".$zimmerinfos."\">&lt;</a><a href=\"$skript?aktion=user_management&sort=id%20DESC".$zimmerinfos."\">&gt;</a>",
 								"Nachname<br><a href=\"$skript?aktion=user_management&sort=nachname%20ASC".$zimmerinfos."\">&lt;</a><a href=\"$skript?aktion=user_management&sort=nachname%20DESC".$zimmerinfos."\">&gt;</a>",
 								"Name<br><a href=\"$skript?aktion=user_management&sort=name%20ASC".$zimmerinfos."\">&lt;</a><a href=\"$skript?aktion=user_management&sort=name%20DESC".$zimmerinfos."\">&gt;</a>",
