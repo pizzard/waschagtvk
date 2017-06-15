@@ -122,7 +122,8 @@ TerminVerwaltung::TerminVerwaltung(QWidget *parent):
 
 
 	try {
-		printTabelle();
+		// multiquery crashes!
+		//printTabelle();
 	}
 	catch(std::exception& e)
 	{
@@ -177,6 +178,8 @@ void TerminVerwaltung::printTabelle() {
    }
 
    QString anfrage = "SELECT user, maschine, zeit FROM termine WHERE (zeit = '" + QString::number(zeit) + "' AND datum = CURDATE()) OR " + gestern + " OR " + morgen;
+   // multiquery crashes!
+   /*
    QSqlQuery qry = multiquery(anfrage, "Fehler Terminansicht!");
    while (qry.next()) {
 	   QString anfrage = "SELECT name, nachname, zimmer FROM users WHERE id = '" + qry.value(0).toString() + "'";
@@ -186,6 +189,7 @@ void TerminVerwaltung::printTabelle() {
 	   int spalte = qry.value(1).toInt();
 	   tabelle[spalte][zeile]->setText(QString::fromUtf8(q.value(1).toString().toLatin1()) + ", " + QString::fromUtf8(q.value(0).toString().toLatin1()) + "   Zi. " + q.value(2).toString());
    }
+   */
 }
 
 void TerminVerwaltung::gibMeldung(QString nachricht) {
@@ -302,7 +306,8 @@ void TerminVerwaltung::getConfig() {
 	QString anfrage = "SELECT id, status FROM waschmaschinen WHERE id <= " + QString::number(anzahl);
 	qry = multiquery(anfrage, "Fehler beim Holen der Konfiguration!");
 	while (qry.next()) {
-		status[qry.value(0).toInt() - 1] = qry.value(1).toInt()==1?true:false;
+		// segfault!
+		//status[qry.value(0).toInt() - 1] = qry.value(1).toInt()==1?true:false;
 	}
 }
 

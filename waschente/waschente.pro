@@ -12,7 +12,7 @@ QT += core \
     widgets
    
     
-CONFIG += release c++11
+CONFIG += debug c++11
 
 # Input
 HEADERS += src/crypt.h \
