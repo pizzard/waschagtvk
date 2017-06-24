@@ -2380,7 +2380,7 @@ sub bucheTermin {
 			if (wieLangSchon($zeit,$datum) < 0) {
 				my $res = geldAbbuchen($preis, $datum, $zeit, $tag);
 				if ($res > 0) {
-					$sth = $dbh->prepare("INSERT INTO termine VALUES ('$gId', '$zeit', '$maschine', '$datum', '".Dateutils::gibTag($tag)."', ".(($res == 1)?0:1).")")|| die "Fehler bei der Datenverarbeitung! 0b0e1b1f $DBI::errstr\n";
+					$sth = $dbh->prepare("INSERT INTO termine (`user`, zeit, maschine, datum, wochentag, bonus) VALUES ('$gId', '$zeit', '$maschine', '$datum', '".Dateutils::gibTag($tag)."', ".(($res == 1)?0:1).")")|| die "Fehler bei der Datenverarbeitung! 0b0e1b1f $DBI::errstr\n";
 					$sth->execute();
 					$sth = $dbh->prepare("UPDATE users SET termine = termine + 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! 80c5b139 $DBI::errstr\n";
 					$sth->execute();
