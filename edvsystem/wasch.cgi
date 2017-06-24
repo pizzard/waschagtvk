@@ -27,6 +27,7 @@ our $exWaschag = 3; # Status: ehemaliges WaschAG-Mitglied
 our $user = 1; # Status: User
 our $wartung = 0; # 1 sperrt das gesamte System fÃ¼r alle User auÃŸer WaschAG + Admin
 our $godWartung = 0; # 1 sperrt das gesamte System für alle User außer Admin
+our $unsafe = 0; # 1 skips all password checks, DANGEROUS, only for testing
 our $superuser = "137.226.143.7";
 our $tvkurt = "137.226.143.4"; #TvKurt Adresse
 our $maxBetrag = 100; #Betrag, den ein User maximal einzahlen darf
@@ -388,6 +389,10 @@ sub validate {
 			#}
 		$error = "IP $ip stimmt nicht. Bitte vom eigenen Rechner oder TvKurt einloggen!";
 		return (0);
+	} elsif ($unsafe) {
+		my $time = $row;
+		benachrichtige($row[3], "!!! Unsafe login aus am $time");
+		return(1);
 	} else {
 		$error = "Passwort falsch!";
 		return(0);
