@@ -245,6 +245,7 @@ if ($aktion eq 'create_user') {
 }
 
 print_footer();		# und der html-ausgabe-teil beendet.
+$dbh->disconnect;
 
 
 # ----- HIER BEGINNT DER ABSCHNITT DER HILFSFUNKTIONEN ENTHÄLT -----
@@ -614,7 +615,6 @@ sub print_footer {
 	my @file = <ENDE>;
 	print @file;
 	close (ENDE);
-	$dbh->disconnect;
 }
 
 # Titelleiste
@@ -622,16 +622,9 @@ sub print_footer {
 sub Titel {
 	my $titel = shift;
 	print "<h1 class=\"page-header\">Hallo $gName $gNname, willkommen im $progName : $titel</h1>";
-	my $sth;
-	my @row;
 	if ($titel ne "Login") {
-		$sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE `user`='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! e90df7e1 $DBI::errstr\n";	# bereitet den befehl vor
-		$sth->execute();
-		my $bestand = 0;
-		if (@row = $sth->fetchrow_array()) {
-			$bestand = $row[0];
-			$bonus = $row[1];
-		}
+		my $bestand = shift;
+		my $bonus = shift;
 		print "<div class=\"alert alert-info\">Dein aktueller Kontostand betr&auml;gt <b>$bestand (+$bonus Bonus ) Euro</b><sup>(1)</sup>.</div>";
 	}
 }
@@ -662,45 +655,15 @@ sub kopf {
 		our $gId = decode("utf-8", $row[4]);
 		our $gSperre = decode("utf-8", $row[5]);
 		our $gLogin = decode("utf-8", $row[6]);
-		print_header();
-		# Menüleisten nach Benutzerstatus
-		if ($gStatus >= $user) {
-			print "<div class=\"navbar navbar-default\">";
-			print "<div class=\"navbar-header\"><a class=\"navbar-brand\" href=\"$skript?aktion=index\">$progName</a></div>";
-			print "<ul class=\"nav navbar-nav\">";
-			print "<li><a href=\"$skript?aktion=look_termine\">Termin buchen</a></li>";
-			print "<li><a href=\"$skript?aktion=kontoauszug\">Kontoauszug</a></li>";
-			print "<li><a href=\"$skript?aktion=ueberweisungsformular\">&Uuml;berweisung anlegen</a></li>";
-			print "<li><a href=\"$skript?aktion=change_pw\">Passwort &auml;ndern</a></li>";
-			print "<li><a href=\"$skript?aktion=logout\">Logout</a></li>";
-			print "</ul><div class=\"navbar-left\">";
-			print "<div>Hilfe ansehen</div>";
-			print "<div class=\"btn-group btn-group-xs\" role=\"group\"><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=ger\">Deutsch</a><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=eng\">Englisch</a></div>";
-			print "</div></div>";
-			}
-		if ($gStatus >= $waschag){
-			print "<ul class=\"nav nav-tabs\">";
-			print "<li><a href=\"$skript?aktion=new_user\">Neuen User erstellen</a></li>";
-			print "<li><a href=\"$skript?aktion=user_management&sort=id%20ASC\">Userverwaltung</a></li>";
-			if ($gStatus >= $god) {
-				print "<li><a href=\"$skript?aktion=preisliste\">Preisverwaltung</a></li>";
-			}
-			print "<li><a href=\"$skript?aktion=waschmaschinen\">Waschmaschinenverwaltung und Konfiguration</a></li>";
-			print "</ul><ul class=\"nav nav-tabs\">";
-			print "<li><a href=\"$skript?aktion=notify_management&sort=id%20ASC\">Firewall-<br>Logfile</a></li>";
-			print "<li><a href=\"$skript?aktion=stats\">Statistik</a></li>";
-			if ($gStatus >= $god) {
-				print "<li><div>Hilfe bearbeiten</div><div class=\"btn-group btn-group-xs\" role=\"group\"><a class=\"btn btn-default\" href=\"$skript?aktion=edit_doku&lang=ger\">Deutsch</a><a class=\"btn btn-default\" href=\"$skript?aktion=edit_doku&lang=eng\">Englisch</a></div></li>";
-			}
-			print "<li><a href=\"$skript?aktion=look_old_data&dir=./logs&file=.\">Alte Daten ansehen</a></li>";
-			print "<li><a href=\"$skript?aktion=create_shout\">Massennachricht<br>versenden</a></li>";
-			print "</ul>";
+		$sth = $dbh->prepare("SELECT bestand, bonus FROM finanzlog WHERE `user`='$gId' ORDER BY datum DESC")|| die "Fehler bei der Datenverarbeitung! e90df7e1 $DBI::errstr\n";	# bereitet den befehl vor
+		$sth->execute();
+		my $bestand = 0;
+		my $bonus = 0;
+		if (@row = $sth->fetchrow_array()) {
+			$bestand = $row[0];
+			$bonus = $row[1];
 		}
-		if (($wartung && $gStatus < $waschag) || ($godWartung && $gStatus < $god)) {
-			Titel("Wartungsarbeiten");
-			printFehler("<br><br>Momentan werden Wartungsarbeiten am System durchgef&uuml;hrt. Habe bitte ein bisschen Geduld!");
-			return (0);
-		}
+		printKopf($gStatus, $anliegen, $bestand, $bonus);
 		# Überprüfung der Zugriffsrechte, ggf. Meldung einer Zugriffsverletzung an die DB
 		if ($gStatus < $neededStatus) {
 			printFehler ("Zugang zu Interna verweigert! Benachrichtigung an Admins versendet.<br><br>Weitere Zugriffsversuche werden geahndet!");
@@ -708,53 +671,100 @@ sub kopf {
 			$sth->execute();	# führt den befehl aus
 			return (0);
 		}
-
-		if ($anliegen eq "index"){
-			Titel("Hauptmen&uuml;");
-		} elsif ($anliegen eq "new_user") {
-			Titel("Neuen User erstellen");
-		} elsif ($anliegen eq "delete_user") {
-			Titel("User l&ouml;schen");
-		} elsif ($anliegen eq "do_edit") {
-			Titel("User bearbeiten");
-		} elsif ($anliegen eq "edit_user") {
-			Titel("User bearbeiten");
-		} elsif ($anliegen eq "create_user") {
-			Titel("Neuen User erstellen");
-		} elsif ($anliegen eq "user_management") {
-			Titel("Userverwaltung");
-		} elsif ($anliegen eq "manage_money") {
-			Titel("Geld ein-/auszahlen");
-		} elsif ($anliegen eq "storno") {
-			Titel("Kulanz gew&auml;hren");
-		} elsif ($anliegen eq "kontoauszug") {
-			Titel("Kontoauszug");
-		} elsif ($anliegen eq "set_preis") {
-			Titel("Preise aendern");
-		} elsif ($anliegen eq "waschmaschinen") {
-			Titel("Waschmaschinen und Haupteinstellungen konfigurieren");
-		} elsif ($anliegen eq "look_termine") {
-			Titel("Terminverwaltung");
-		} elsif ($anliegen eq "notify_management") {
-			Titel("Firewall-Log");
-		} elsif ($anliegen eq "ueberweisung") {
-			Titel("&Uuml;berweisung");
-		} elsif ($anliegen eq "show_doku") {
-			Titel("Hilfe");
-		} elsif ($anliegen eq "edit_doku") {
-			Titel("Hilfe bearbeiten");
-		} elsif ($anliegen eq "change_pw") {
-			Titel("Passwort &auml;ndern");
-		} elsif ($anliegen eq "stats") {
-			Titel("Statistik");
-		} elsif ($anliegen eq "data") {
-			Titel("Logbuch");
-		} elsif ($anliegen eq "shout") {
-			Titel("Massennachricht");
-		}
 	}
 	getConfig();
 	return (1);
+}
+
+sub printKopf {
+	my ($gStatus, $anliegen, $bestand, $bonus) = @_;
+	print_header();
+	# Menüleisten nach Benutzerstatus
+	if ($gStatus >= $user) {
+		print "<div class=\"navbar navbar-default\">";
+		print "<div class=\"navbar-header\"><a class=\"navbar-brand\" href=\"$skript?aktion=index\">$progName</a></div>";
+		print "<ul class=\"nav navbar-nav\">";
+		print "<li><a href=\"$skript?aktion=look_termine\">Termin buchen</a></li>";
+		print "<li><a href=\"$skript?aktion=kontoauszug\">Kontoauszug</a></li>";
+		print "<li><a href=\"$skript?aktion=ueberweisungsformular\">&Uuml;berweisung anlegen</a></li>";
+		print "<li><a href=\"$skript?aktion=change_pw\">Passwort &auml;ndern</a></li>";
+		print "<li><a href=\"$skript?aktion=logout\">Logout</a></li>";
+		print "</ul><div class=\"navbar-left\">";
+		print "<div>Hilfe ansehen</div>";
+		print "<div class=\"btn-group btn-group-xs\" role=\"group\"><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=ger\">Deutsch</a><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=eng\">Englisch</a></div>";
+		print "</div></div>";
+		}
+	if ($gStatus >= $waschag){
+		print "<ul class=\"nav nav-tabs\">";
+		print "<li><a href=\"$skript?aktion=new_user\">Neuen User erstellen</a></li>";
+		print "<li><a href=\"$skript?aktion=user_management&sort=id%20ASC\">Userverwaltung</a></li>";
+		if ($gStatus >= $god) {
+			print "<li><a href=\"$skript?aktion=preisliste\">Preisverwaltung</a></li>";
+		}
+		print "<li><a href=\"$skript?aktion=waschmaschinen\">Waschmaschinenverwaltung und Konfiguration</a></li>";
+		print "</ul><ul class=\"nav nav-tabs\">";
+		print "<li><a href=\"$skript?aktion=notify_management&sort=id%20ASC\">Firewall-<br>Logfile</a></li>";
+		print "<li><a href=\"$skript?aktion=stats\">Statistik</a></li>";
+		if ($gStatus >= $god) {
+			print "<li><div>Hilfe bearbeiten</div><div class=\"btn-group btn-group-xs\" role=\"group\"><a class=\"btn btn-default\" href=\"$skript?aktion=edit_doku&lang=ger\">Deutsch</a><a class=\"btn btn-default\" href=\"$skript?aktion=edit_doku&lang=eng\">Englisch</a></div></li>";
+		}
+		print "<li><a href=\"$skript?aktion=look_old_data&dir=./logs&file=.\">Alte Daten ansehen</a></li>";
+		print "<li><a href=\"$skript?aktion=create_shout\">Massennachricht<br>versenden</a></li>";
+		print "</ul>";
+	}
+	$_Titel = sub {
+		my ($titel) = @_;
+		Titel($titel, $bestand, $bonus);
+	};
+	if (($wartung && $gStatus < $waschag) || ($godWartung && $gStatus < $god)) {
+		$_Titel->("Wartungsarbeiten");
+		printFehler("<br><br>Momentan werden Wartungsarbeiten am System durchgef&uuml;hrt. Habe bitte ein bisschen Geduld!");
+		return (0);
+	}
+
+	if ($anliegen eq "index"){
+		$_Titel->("Hauptmen&uuml;");
+	} elsif ($anliegen eq "new_user") {
+		$_Titel->("Neuen User erstellen");
+	} elsif ($anliegen eq "delete_user") {
+		$_Titel->("User l&ouml;schen");
+	} elsif ($anliegen eq "do_edit") {
+		$_Titel->("User bearbeiten");
+	} elsif ($anliegen eq "edit_user") {
+		$_Titel->("User bearbeiten");
+	} elsif ($anliegen eq "create_user") {
+		$_Titel->("Neuen User erstellen");
+	} elsif ($anliegen eq "user_management") {
+		$_Titel->("Userverwaltung");
+	} elsif ($anliegen eq "manage_money") {
+		$_Titel->("Geld ein-/auszahlen");
+	} elsif ($anliegen eq "storno") {
+		$_Titel->("Kulanz gew&auml;hren");
+	} elsif ($anliegen eq "kontoauszug") {
+		$_Titel->("Kontoauszug");
+	} elsif ($anliegen eq "set_preis") {
+		$_Titel->("Preise aendern");
+	} elsif ($anliegen eq "waschmaschinen") {
+		$_Titel->("Waschmaschinen und Haupteinstellungen konfigurieren");
+	} elsif ($anliegen eq "look_termine") {
+		$_Titel->("Terminverwaltung");
+	} elsif ($anliegen eq "notify_management") {
+		$_Titel->("Firewall-Log");
+	} elsif ($anliegen eq "ueberweisung") {
+		$_Titel->("&Uuml;berweisung");
+	} elsif ($anliegen eq "show_doku") {
+		$_Titel->("Hilfe");
+	} elsif ($anliegen eq "edit_doku") {
+		$_Titel->("Hilfe bearbeiten");
+	} elsif ($anliegen eq "change_pw") {
+		$_Titel->("Passwort &auml;ndern");
+	} elsif ($anliegen eq "stats") {
+		$_Titel->("Statistik");
+	} elsif ($anliegen eq "data") {
+		$_Titel->("Logbuch");
+	} elsif ($anliegen eq "shout") {
+		$_Titel->("Massennachricht");
+	}
 }
 
 # Macht eine Tabellenzeile für die Userverwaltung mit den beiden Buttons "bearbeiten" und "löschen"
