@@ -41,6 +41,11 @@ our $anzahlMaschinen;
 our $error = ''; # temporÃ¤re Variable für diverse Fehlermeldungen
 our $terminhash = ''; # ist der has des users für den ical-export
 
+# parameters from CGI; will be set below
+# (not relevant for all aktions)
+our $target_user_id;
+our $login_id;
+
 # Öffnen der Datenbank
 #		my $X;
 #    open( DBINI, "< ".$include."config.ini" );
@@ -57,166 +62,171 @@ $dbh = DBI->connect($cfg->val("wasch","db"),$cfg->val("wasch","user")) or die $D
 
 
 # Start HTML
-if ($cgi->url_param('aktion') eq 'create_user') {
+my $aktion = $cgi->url_param('aktion');
+$target_user_id = makeclean($cgi->url_param('id'));
+$login_id = $cgi->param('login');
+my $ui_lang = makeclean($cgi->url_param('lang')) || "eng";  # or "ger"
+
+if ($aktion eq 'create_user') {
 		if (kopf("create_user", $waschag) == 1) {
 			create_user();
 		}
-} elsif ($cgi->url_param('aktion') eq 'login') {
+} elsif ($aktion eq 'login') {
 	firstLogin();
-} elsif ($cgi->url_param('aktion') eq 'logout') {
+} elsif ($aktion eq 'logout') {
 	logout();
-} elsif ($cgi->url_param('aktion') eq 'index') {
+} elsif ($aktion eq 'index') {
 	if (kopf("index", $user) == 1) {
 		hauptMenue();
 	}
 	# User Management
-} elsif ($cgi->url_param('aktion') eq 'new_user') {
+} elsif ($aktion eq 'new_user') {
 	if (kopf("new_user", $waschag) == 1) {
 		gibNewForm();
 	}
-} elsif ($cgi->url_param('aktion') eq 'edit_user') {
+} elsif ($aktion eq 'edit_user') {
 	if (kopf("edit_user", $waschag) == 1) {
-		start_edit(makeclean($cgi->url_param('id')));
+		start_edit($target_user_id);
 	}
-} elsif ($cgi->url_param('aktion') eq 'show_user_finance') {
+} elsif ($aktion eq 'show_user_finance') {
 	if (kopf("show_user_finance", $waschag) == 1) {
-		user_finance(makeclean($cgi->url_param('id')));
+		user_finance($target_user_id);
 	}
-} elsif ($cgi->url_param('aktion') eq 'change_pw') {
+} elsif ($aktion eq 'change_pw') {
 	if (kopf("change_pw", $user) == 1) {
 		changePW() ;
 	}
-} elsif ($cgi->url_param('aktion') eq 'do_change_pw') {
+} elsif ($aktion eq 'do_change_pw') {
 	if (kopf("change_pw", $user) == 1) {
 		doChange();
 	}
-} elsif ($cgi->url_param('aktion') eq 'delete_user') {
+} elsif ($aktion eq 'delete_user') {
 	if (kopf("delete_user", $waschag) == 1) {
-		delete_user(makeclean($cgi->url_param('id')));
+		delete_user($target_user_id);
 	}
-} elsif ($cgi->url_param('aktion') eq 'mach_tot') {
+} elsif ($aktion eq 'mach_tot') {
 	if (kopf("delete_user", $waschag) == 1) {
-		deleteUserEndgueltig(makeclean($cgi->url_param('id')));
+		deleteUserEndgueltig($target_user_id);
 	}
-} elsif ($cgi->url_param('aktion') eq 'do_edit') {
+} elsif ($aktion eq 'do_edit') {
 	if (kopf("do_edit", $waschag) == 1) {
 		do_edit();
 	}
-} elsif ($cgi->url_param('aktion') eq 'user_management') {
+} elsif ($aktion eq 'user_management') {
 	if (kopf("user_management", $waschag) == 1) {
 		userVerwaltung();
 	}
-} elsif ($cgi->url_param('aktion') eq 'manage_money') {
+} elsif ($aktion eq 'manage_money') {
 	if (kopf("manage_money", $waschag) == 1) {
 		manage_money();
 	}
-} elsif ($cgi->url_param('aktion') eq 'admin_transaktion') {
+} elsif ($aktion eq 'admin_transaktion') {
 	if (kopf("manage_money", $waschag) == 1) {
 		admin_transaktion();
 	}
-} elsif ($cgi->url_param('aktion') eq 'god_transaktion') {
+} elsif ($aktion eq 'god_transaktion') {
 	if (kopf("manage_admin_money", $admin) == 1) {
 		god_transaktion();
 	}
-} elsif ($cgi->url_param('aktion') eq 'self_transaktion') {
+} elsif ($aktion eq 'self_transaktion') {
 	if (kopf("manage_admin_money", $admin) == 1) {
 		self_transaktion();
 	}
-} elsif ($cgi->url_param('aktion') eq 'kontoauszug') {
+} elsif ($aktion eq 'kontoauszug') {
 	if (kopf("kontoauszug", $user) == 1) {
 		kontoAuszug();
 	}
-} elsif ($cgi->url_param('aktion') eq 'ueberweisungsformular') {
+} elsif ($aktion eq 'ueberweisungsformular') {
 	if (kopf("ueberweisung", $user) == 1) {
 		ueberweisungsFormular();
 	}
-} elsif ($cgi->url_param('aktion') eq 'ueberweisung') {
+} elsif ($aktion eq 'ueberweisung') {
 	if (kopf("ueberweisung", $user) == 1) {
 		ueberweisung();
 	}
-} elsif ($cgi->url_param('aktion') eq 'storno') {
+} elsif ($aktion eq 'storno') {
 	if (kopf("storno", $user) == 1) {
 		storno();
 	}
 	# Konfiguration
-} elsif ($cgi->url_param('aktion') eq 'waschmaschinen') {
+} elsif ($aktion eq 'waschmaschinen') {
 	if (kopf("waschmaschinen", $waschag) == 1) {
 		maschinenVerwaltung();
 	}
-} elsif ($cgi->url_param('aktion') eq 'set_waschmaschinen') {
+} elsif ($aktion eq 'set_waschmaschinen') {
 	if (kopf("waschmaschinen", $waschag) == 1) {
-		maschineSetConfig(makeclean($cgi->url_param('id')));
+		maschineSetConfig($target_user_id);
 	}
-} elsif ($cgi->url_param('aktion') eq 'set_config') {
+} elsif ($aktion eq 'set_config') {
 	if (kopf("waschmaschinen", $waschag) == 1) {
 		set_config();
 	}
-} elsif ($cgi->url_param('aktion') eq 'preisliste') {
+} elsif ($aktion eq 'preisliste') {
 	if (kopf("set_preis", $god) == 1) {
 		preisListe();
 	}
-} elsif ($cgi->url_param('aktion') eq 'set_preis') {
+} elsif ($aktion eq 'set_preis') {
 	if (kopf("set_preis", $god) == 1) {
 		set_preis();
 	}
-} elsif ($cgi->url_param('aktion') eq 'set_einheits_preis') {
+} elsif ($aktion eq 'set_einheits_preis') {
 	if (kopf("set_preis", $god) == 1) {
 		set_einheits_preis();
 	}
 	# Termine
-} elsif ($cgi->url_param('aktion') eq 'look_termine') {
+} elsif ($aktion eq 'look_termine') {
 	if (kopf("look_termine", $user) == 1) {
 		look_termine();
 	}
-} elsif ($cgi->url_param('aktion') eq 'buchen') {
+} elsif ($aktion eq 'buchen') {
 	if (kopf("look_termine", $user) == 1) {
 		bucheTermin();
 	}
-} elsif ($cgi->url_param('aktion') eq 'notify_management') {
+} elsif ($aktion eq 'notify_management') {
 	if (kopf("notify_management", $waschag) == 1) {
 		notifyVerwaltung();
 	}
-} elsif ($cgi->url_param('aktion') eq 'show_doku') {
+} elsif ($aktion eq 'show_doku') {
 	if (kopf("show_doku", $user) == 1) {
-		show_doku(makeclean($cgi->url_param('lang')));
+		show_doku($ui_lang);
 	}
-} elsif ($cgi->url_param('aktion') eq 'edit_doku') {
+} elsif ($aktion eq 'edit_doku') {
 	if (kopf("edit_doku", $god) == 1) {
-		edit_doku(makeclean($cgi->url_param('lang')));
+		edit_doku($ui_lang);
 	}
-} elsif ($cgi->url_param('aktion') eq 'new_doku') {
+} elsif ($aktion eq 'new_doku') {
 	if (kopf("edit_doku", $god) == 1) {
-		new_doku(makeclean($cgi->url_param('lang')),makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
+		new_doku($ui_lang,makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
 	}
-} elsif ($cgi->url_param('aktion') eq 'write_doku') {
+} elsif ($aktion eq 'write_doku') {
 	if (kopf("edit_doku", $god) == 1) {
-		write_doku(makeclean($cgi->url_param('lang')),makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
+		write_doku($ui_lang,makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
 	}
-} elsif ($cgi->url_param('aktion') eq 'edit_this_doku') {
+} elsif ($aktion eq 'edit_this_doku') {
 	if (kopf("edit_doku", $god) == 1) {
-		edit_this_doku(makeclean($cgi->url_param('lang')),makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
+		edit_this_doku($ui_lang,makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
 	}
-} elsif ($cgi->url_param('aktion') eq 'del_doku') {
+} elsif ($aktion eq 'del_doku') {
 	if (kopf("edit_doku", $god) == 1) {
-		del_doku(makeclean($cgi->url_param('sure')),makeclean($cgi->url_param('lang')),makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
+		del_doku(makeclean($cgi->url_param('sure')),$ui_lang,makeclean($cgi->url_param('p')),makeclean($cgi->url_param('a')),makeclean($cgi->url_param('s')));
 	}
-} elsif ($cgi->url_param('aktion') eq 'stats') {
+} elsif ($aktion eq 'stats') {
 	if (kopf("stats", $waschag) == 1) {
 		statistik();
 	}
-} elsif ($cgi->url_param('aktion') eq 'look_banned_poopies') {
+} elsif ($aktion eq 'look_banned_poopies') {
 	if (kopf("stats", $waschag) == 1) {
 		look_banned_people();
 	}
-} elsif ($cgi->url_param('aktion') eq 'look_old_data') {
+} elsif ($aktion eq 'look_old_data') {
 	if (kopf("data", $waschag) == 1) {
 		look_old_data($cgi->url_param('dir'), $cgi->url_param('file'));
 	}
-} elsif ($cgi->url_param('aktion') eq 'create_shout') {
+} elsif ($aktion eq 'create_shout') {
 	if (kopf("shout", $waschag) == 1) {
 		create_shout();
 	}
-} elsif ($cgi->url_param('aktion') eq 'send_shout') {
+} elsif ($aktion eq 'send_shout') {
 	if (kopf("shout", $waschag) == 1) {
 		massenNachricht();
 	}
@@ -851,7 +861,7 @@ sub logon {
 
 # prüft die beim Login eingegebenen Werte und setzt die Cookies
 sub firstLogin {
-	my $login = $cgi->param('login');
+	my $login = $login_id;
 	my $pw = crypt($cgi->param('pw'), "ps");
 	if (validate(vorbereiten($login), $pw) == 1){
 		$login = vorbereiten($login);
@@ -1072,7 +1082,7 @@ sub gibNewForm {
 sub create_user {
 	if(sperrCheck()==1) { return; }
 	#holen der Daten
-	my $login = $cgi->param('login');
+	my $login = $login_id;
 	my $name = $cgi->param('name');
 	my $nname = $cgi->param('nachname');
 	my $zimmer = $cgi->param('zimmer');
@@ -1344,12 +1354,12 @@ sub do_edit {
 	if(sperrCheck()==1) { return; }
 	#holen der Daten
 	my $pw = $cgi->param('pw');;
-	my $login = $cgi->param('login');
+	my $login = $login_id;
 	my $name = $cgi->param('name');
 	my $nname = $cgi->param('nachname');
 	my $zimmer = $cgi->param('zimmer');
 	my $ip = $cgi->param('ip');
-	my $id = $cgi->url_param('id');
+	my $id = $target_user_id;
 	my $status = $cgi->param('status');
 	my $sperre = $cgi->param('sperre');
 	my $nachricht = $cgi->param('nachricht');
@@ -1433,7 +1443,7 @@ sub do_edit {
 
 sub manage_money {
 	if(sperrCheck()==1) { return; }
-	my $id = $cgi->url_param('id');
+	my $id = $target_user_id;
 	my $sth = $dbh->prepare("SELECT login , name , nachname, status, zimmer FROM users WHERE id=$id")|| die "Fehler bei der Datenverarbeitung! 012f0057 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	my @row = $sth->fetchrow_array;
@@ -1504,7 +1514,7 @@ sub manage_money {
 # Transaktion, wenn sich jmd Geld zum Waschen ein-/auszahlen lässt
 sub admin_transaktion {
 	if(sperrCheck()==1) { return; }
-	my $id = $cgi->url_param('id');
+	my $id = $target_user_id;
 	my $betrag = $cgi->param('betrag');
 	my $sth = $dbh->prepare("SELECT name, nachname, zimmer FROM users WHERE id='$id'")|| die "Fehler bei der Datenverarbeitung! 86ca1999 $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
@@ -1542,7 +1552,7 @@ sub admin_transaktion {
 # prüft Gültigkeit einer Stornierung und führt gegebenenfalls diese durch
 sub storno {
 	if(sperrCheck()==1) { return; }
-	my $id = $cgi->url_param('id');
+	my $id = $target_user_id;
 	my $grund = encode("utf-8", $cgi->param('grund'));
 	if($grund eq "") {
 		printFehler("Kein Grund angegeben!");
@@ -1655,7 +1665,7 @@ sub ueberweisungsFormular {
 # führt die Überweisung aus
 sub ueberweisung {
 	if(sperrCheck("N&ouml; dein Geld bleibt erstmal hier...")==1) { return; }
-	my $empfang = vorbereiten($cgi->param('login'));
+	my $empfang = vorbereiten($login_id);
 	if(vorbereiten($gLogin) eq $empfang) {
 		printFehler("Du kannst dir nicht selber &uuml;berweisen!");
 		return;
@@ -1700,7 +1710,7 @@ sub ueberweisung {
 # Transaktion zwischen Wasch-AG Mitglied und Kassenwart
 sub god_transaktion {
 	if(sperrCheck()==1) { return; }
-	my $id = $cgi->url_param('id');
+	my $id = $target_user_id;
 	my $betrag = $cgi->param('betrag');
 	my $zweck = makeclean($cgi->param('zweck'));
 	$zweck = makeclean($zweck);
