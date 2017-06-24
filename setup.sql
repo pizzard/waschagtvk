@@ -10,9 +10,8 @@
 -- DROP TABLE doku_eng;
 
 CREATE TABLE config (
-  id INTEGER PRIMARY KEY NOT NULL,
-  zweck INTEGER,
-  wert INTEGER
+  zweck VARCHAR(64) PRIMARY KEY NOT NULL,
+  wert FLOAT
 );
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -29,7 +28,7 @@ CREATE TABLE users (
   lastlogin TIMESTAMP,
   gotfreimarken BOOLEAN,
   von INTEGER REFERENCES users(id),
-  termine INTEGER  -- FOREIGN KEY REFERENCES termine(id)
+  termine INTEGER  -- number of used appointments
 );
 CREATE TABLE waschmaschinen (
   id INTEGER PRIMARY KEY NOT NULL,
@@ -38,7 +37,7 @@ CREATE TABLE waschmaschinen (
   von INTEGER REFERENCES users(id)
 );
 CREATE TABLE finanzlog (
-  enduser INTEGER REFERENCES users(id),
+  'user' INTEGER REFERENCES users(id),  -- user is a keyword! https://dev.mysql.com/doc/refman/5.7/en/keywords.html
   bestand INTEGER,
   aktion INTEGER,  -- betrag
   bemerkung VARCHAR(255),
@@ -47,17 +46,16 @@ CREATE TABLE finanzlog (
   id SERIAL PRIMARY KEY
 );
 CREATE TABLE termine (
-  id INTEGER PRIMARY KEY NOT NULL,
-  wochentag INTEGER,
+  'user' INTEGER REFERENCES users(id),
+  zeit INTEGER,
+  maschine INTEGER REFERENCES waschmaschinen(id),
   datum DATE,
-  zeit TIMESTAMP,
-  bonus BOOLEAN,
-  enduser INTEGER REFERENCES users(id),
-  maschine INTEGER REFERENCES waschmaschinen(id)
+  wochentag INTEGER,
+  bonus BOOLEAN DEFAULT 0,
+  PRIMARY KEY (zeit, maschine, datum)
 );
-ALTER TABLE users ADD CONSTRAINT FK_termine FOREIGN KEY (termine) REFERENCES termine(id);
 CREATE TABLE waschagtransaktionen (
-  enduser INTEGER REFERENCES users(id),
+  'user' INTEGER REFERENCES users(id),
   aktion INTEGER,
   bestand INTEGER,
   bemerkung VARCHAR(255),
@@ -65,10 +63,10 @@ CREATE TABLE waschagtransaktionen (
   id SERIAL PRIMARY KEY
 );
 CREATE TABLE preise (
-  id INTEGER PRIMARY KEY NOT NULL,
-  preis INTEGER,
+  zeit INTEGER,  -- 0..15 available slots
   tag INTEGER,  -- 0..6 weekday
-  zeit INTEGER  -- 0..15 available slots
+  preis INTEGER,
+  id SERIAL PRIMARY KEY
 );
 CREATE TABLE notify (
   id INTEGER PRIMARY KEY NOT NULL,  -- compared with users.id
@@ -95,3 +93,12 @@ INSERT INTO users (login,pw,status) VALUES ('w','b',9);
 INSERT INTO waschmaschinen (id,status) VALUES (0,0);
 INSERT INTO waschmaschinen (id,status) VALUES (1,1);
 INSERT INTO waschmaschinen (id,status) VALUES (2,2);
+INSERT INTO config (zweck, wert) VALUES
+  ( "Stornierzeit (in Min)",    5 ),
+  ( "Antrittszeit (in Min)",   15 ),
+  ( "minimaler Einzahlbetrag (in Euro)",    5 ),
+  ( "Termine pro Monat",   12 ),
+  ( "Relaiszeit (in Min)",    5 ),
+  ( "Freigeld fuer WaschAG",   12 ),
+  ( "Vorhaltezeit Kontodaten (in Monaten)",    3 ),
+  ( "Vorhaltezeit WAG-Kontodaten (in Monaten)",    8 );
