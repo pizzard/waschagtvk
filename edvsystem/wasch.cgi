@@ -931,6 +931,8 @@ sub sperrCheck {
 
 # Login-Formular
 sub logon {
+	# required note per EU directive 2009/136/EC
+	print "<p class=\"alert alert-info\">Wir verwenden cookies, damit du dich nur einmal pro Sitzung anmelden musst! <a href=\"http://cookiepedia.co.uk/all-about-cookies\" class=\"alert-link\">Lies mehr &uuml;ber Cookies</a></p>";
 	my $login = "";
 	$login = shift;
 	if ($error ne '') {
