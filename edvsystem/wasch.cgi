@@ -61,6 +61,8 @@ if ($cgi->url_param('aktion') eq 'create_user') {
 		}
 } elsif ($cgi->url_param('aktion') eq 'login') {
 	firstLogin();
+} elsif ($cgi->url_param('aktion') eq 'logout') {
+	logout();
 } elsif ($cgi->url_param('aktion') eq 'index') {
 	if (kopf("index", $user) == 1) {
 		hauptMenue();
@@ -442,15 +444,34 @@ sub gibWaschTerminTechnisch {
 sub setCookies {
 	my $login = shift;
 	my $pw = shift;
+	my $expires = "+1D";
 	my $cLogin = $cgi->cookie (
 		-NAME => 'wlogin',
-		-VALUE => $login
+		-VALUE => $login,
+		-EXPIRES => $expires
 	);
 	my $cPw = $cgi->cookie (
 		-NAME => 'wpw',
-		-VALUE => $pw
+		-VALUE => $pw,
+		-EXPIRES => $expires
 	);
 	print $cgi->redirect(-URL=>"$skript?aktion=index&del=no", -cookie=>[$cLogin, $cPw]);
+}
+
+# Deletes all cookies
+sub logout {
+	my $expires = "-1m";  # already expired --> delete!
+	my $cLogin = $cgi->cookie (
+		-NAME => 'wlogin',
+		-VALUE => '',
+		-EXPIRES => $expires
+	);
+	my $cPw = $cgi->cookie (
+		-NAME => 'wpw',
+		-VALUE => '',
+		-EXPIRES => $expires
+	);
+	print $cgi->redirect(-URL=>"$skript", -cookie=>[$cLogin, $cPw]);
 }
 
 # gibt das aktuelle Datum + n Tage (als Parameter) im richtigen Format für MySQL zurück
@@ -753,6 +774,7 @@ sub kopf {
 			print "<li><a href=\"$skript?aktion=kontoauszug\">Kontoauszug</a></li>";
 			print "<li><a href=\"$skript?aktion=ueberweisungsformular\">&Uuml;berweisung anlegen</a></li>";
 			print "<li><a href=\"$skript?aktion=change_pw\">Passwort &auml;ndern</a></li>";
+			print "<li><a href=\"$skript?aktion=logout\">Logout</a></li>";
 			print "</ul><div class=\"navbar-left\">";
 			print "<div>Hilfe ansehen</div>";
 			print "<div class=\"btn-group btn-group-xs\" role=\"group\"><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=ger\">Deutsch</a><a class=\"btn btn-default\" href=\"$skript?aktion=show_doku&lang=eng\">Englisch</a></div>";
