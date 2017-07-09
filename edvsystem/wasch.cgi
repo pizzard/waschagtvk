@@ -2480,7 +2480,7 @@ sub bucheTermin {
 					$sth->execute();
 					$sth = $dbh->prepare("UPDATE users SET termine = termine + 1 WHERE id = '$gId'")|| die "Fehler bei der Datenverarbeitung! 80c5b139 $DBI::errstr\n";
 					$sth->execute();
-					my $bucheTermin_success_message = "<div class=\"row\"><div class=\"col-md-3\"><img src=\"//137.226.142.9/care-label.jpg\" alt=\"care label\" class=\"img-responsive\"></div><div class=\"col-md-7\"><h3>Termin erfolgreich gebucht!</h3><p>Viel Spa&szlig; beim Waschen! <a href=\"http://www.clevercare.info/de/temperatur-0\">Mach dich schon mal schlau &uuml;ber W&auml;sche!</a></p><p>Noch Fragen? <a href=\"mailto:waschag\@tvk.rwth-aachen.de\">Schreib uns!</a></p></div></div>";
+					my $bucheTermin_success_message = "<div class=\"row alert alert-success\"><div class=\"col-md-2\"><img src=\"//137.226.142.9/care-label.jpg\" alt=\"care label\" class=\"img-responsive\"></div><div class=\"col-md-10\"><h3>Termin erfolgreich gebucht!</h3><p>Viel Spa&szlig; beim Waschen! <a href=\"http://www.clevercare.info/de/temperatur-0\" class=\"alert-link\">Mach dich schon mal schlau &uuml;ber W&auml;sche!</a></p><p>Noch Fragen? <a href=\"mailto:waschag\@tvk.rwth-aachen.de\" class=\"alert-link\">Schreib uns!</a></p></div></div>";
 					printFehler($bucheTermin_success_message);
 					return;
 				} else {
