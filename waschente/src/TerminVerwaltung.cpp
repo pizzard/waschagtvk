@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QFont>
 #include <QVariant>
+#include <QSqlRecord>
 #include "WashingProgram.h"
 #include "TerminVerwaltung.h"
 #include "Hilfsfunktionen.h"
@@ -682,8 +683,30 @@ QSqlQuery TerminVerwaltung::multiquery(QString anfrage, const char* error) {
 	QSqlQuery qry(db);
 	if (!qry.prepare(anfrage))
 		throw std::runtime_error((QString(error) + QString(" Query korrupt: ") + anfrage).toStdString());
+	qDebug() << "querying " << anfrage;
 	if (!qry.exec())
 		throw std::runtime_error((QString(error) + QString(" Query nicht ausgeführt: ") + anfrage).toStdString());
+	qDebug() << QString::asprintf("got [%d]", qry.size());
+	if (!qry.first()) {
+		return qry;  // just empty
+	}
+	const int n = qry.record().count();
+	qry.seek(-1);
+	while (qry.next()) {
+		QString valstr = "";
+		auto values = qry.boundValues();
+		if (values.count() > 0) {
+			for(auto& item: values) {
+				valstr += item.toString() + ": " + values[item.toString()].toString() + ", ";
+			}
+		} else {
+			for(int i=0; i<n; ++i) {
+				valstr += qry.value(i).toString() + ", ";
+			}
+		}
+		qDebug() << "(" << valstr << "), ";
+	}
+	qry.seek(-1);  // seek back
 	return qry;
 }
 
