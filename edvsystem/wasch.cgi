@@ -356,9 +356,9 @@ sub validate {
 		}
 		if (substr($ip,0,3) eq "10.")
 		{
-		       my $time = $row[4];
-		       benachrichtige($row[3], "Login vom TuermeRoam aus am $time");
-		       return(1);
+			my $time = $row[4];
+			benachrichtige($row[3], "Login vom TuermeRoam aus am $time");
+			return(1);
 		}
 
 			#Workaround for high level no ip check
@@ -687,22 +687,22 @@ sub benachrichtige {
 
 # Kopf jeder Seite, implementiert das Design der Netz-AG
 sub print_header {
-     print "Content-type: text/html\n\n";
-     open (START, " /var/www/start.inc");
-          my @file = <START>;
-          print @file;
-     close (START);
-     print "<head>";
-     print "<title>$progName</title>";
-     print "<style type=\"text/css\">";
-		 print "a.red {color: #FF0000}";
-		 print "a.yellow {color: #FFFF00}";
-		 print "a.green {color:#008f00}";
-		 print "a.green:hover {color:#ff9900}";
-		 print "</style>";
-     print "<!-- Latest compiled and minified CSS -->";
-     print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">';
-     print "</head>";
+	print "Content-type: text/html\n\n";
+	open (START, " /var/www/start.inc");
+	my @file = <START>;
+	print @file;
+	close (START);
+	print "<head>";
+	print "<title>$progName</title>";
+	print "<style type=\"text/css\">";
+		print "a.red {color: #FF0000}";
+		print "a.yellow {color: #FFFF00}";
+		print "a.green {color:#008f00}";
+		print "a.green:hover {color:#ff9900}";
+		print "</style>";
+	print "<!-- Latest compiled and minified CSS -->";
+	print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">';
+	print "</head>";
 	print "<body>";
 }
 
@@ -712,11 +712,11 @@ sub print_footer {
 	print "<tr><td style=\"text-align: left\"> $progName $version</td><td style=\"text-align: right\">by $godsName </td></tr>";
 	print "<tr><td colspan=2><b>(1)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
 	print "</body>";
-     open (ENDE, "/var/www/start.inc");
-          my @file = <ENDE>;
-          print @file;
-     close (ENDE);
-  $dbh->disconnect;
+	open (ENDE, "/var/www/start.inc");
+	my @file = <ENDE>;
+	print @file;
+	close (ENDE);
+	$dbh->disconnect;
 }
 
 # Titelleiste
@@ -1040,7 +1040,7 @@ sub hauptMenue {
 			while(@row = $sth->fetchrow_array()){
 				if ($row[0] != 8) {
 					my $bonustermin = "";
-					if($row[4] != 0) { $bonustermin = "(Bonustermin)"; } 
+					if($row[4] != 0) { $bonustermin = "(Bonustermin)"; }
 					normalTabellenZeile("black", gibTagTextOhneOffset($row[0]), $row[1], gibWaschTermin($row[2])." Uhr", "Maschine ".$row[3]. " ".$bonustermin."<a href=\"$skript?aktion=index&storn=yes&datum=$row[1]&zeit=$row[2]&maschine=$row[3]\">stornieren</a>");
 				}
 			}
@@ -1102,25 +1102,25 @@ sub isValidIP {
 
 #Hilfsfunktion zur Generierung neuer Passwörter
 sub genPw {
-   my $length = 8 + (int(rand(2)));
-   my @possible = ('abcdefghijkmnpqrstuvwxyz', '23456789', 'ABCDEFGHJKLMNPQRSTUVWXYZ');
-   my $password;
-   my @types = (0,0,0);
-   while (length($password) < $length -3) {
-	my $i = (int(rand(scalar(@possible))));
-	$types[$i] = 1;
-	$password .= substr($possible[$i], (int(rand(length($possible[$i])))), 1);
-   }
-   
-   for(my $i = 0; $i < 3; $i++) {
-	if($types[$i] < 1){
+	my $length = 8 + (int(rand(2)));
+	my @possible = ('abcdefghijkmnpqrstuvwxyz', '23456789', 'ABCDEFGHJKLMNPQRSTUVWXYZ');
+	my $password;
+	my @types = (0,0,0);
+	while (length($password) < $length -3) {
+		my $i = (int(rand(scalar(@possible))));
+		$types[$i] = 1;
 		$password .= substr($possible[$i], (int(rand(length($possible[$i])))), 1);
-	}else{
-		my $j = (int(rand(scalar(@possible))));
-		$password .= substr($possible[$j], (int(rand(length($possible[$j])))), 1);
 	}
-   }
-   return $password;
+
+	for(my $i = 0; $i < 3; $i++) {
+		if($types[$i] < 1){
+			$password .= substr($possible[$i], (int(rand(length($possible[$i])))), 1);
+		}else{
+			my $j = (int(rand(scalar(@possible))));
+			$password .= substr($possible[$j], (int(rand(length($possible[$j])))), 1);
+		}
+	}
+	return $password;
 }
 
 # Formular zum ändern des Passwortes
@@ -1179,7 +1179,7 @@ sub gibNewForm {
 	print "<table cellspacing=\"5\" cellpadding=\"3\" style='border: 0px;'>";
 	print "<tr><td>Login:</td><td><input name=\"login\" size=\"40\" value=\"$login\"></td></tr>";
 	print "<tr><td>Nachname:</td><td><input name=\"nachname\" size=\"40\" value=\"$nname\"></td></tr>";
-	print "<tr><td>Vorname:</td><td><input name=\"name\" size=\"40\" value=\"$name\"></td></tr>";	
+	print "<tr><td>Vorname:</td><td><input name=\"name\" size=\"40\" value=\"$name\"></td></tr>";
 	print "<tr><td>Zimmer:</td><td><input name=\"zimmer\" size=\"4\" value=\"$zimmer\"></td></tr>";
 	print "<tr><td>IP:</td><td><input name=\"ip\" size=\"15\" value=\"$ip\"></td></tr>";
 	print "</table><input type=\"submit\" value=\"Formulardaten absenden\"></form>";
@@ -1196,13 +1196,13 @@ sub create_user {
 	my $zimmer = $cgi->param('zimmer');
 	my $ip = $cgi->param('ip');
 	my $ok = notLeer($login, 'Loginname')
-				 + notLeer($name, 'Vorname')
-				 + notLeer($nname, 'Nachname')
-				 + notLeer($login, 'Loginname')
-				 + isValidZimmer($zimmer)
-				 + isValidIP($ip);
+				+ notLeer($name, 'Vorname')
+				+ notLeer($nname, 'Nachname')
+				+ notLeer($login, 'Loginname')
+				+ isValidZimmer($zimmer)
+				+ isValidIP($ip);
 
-  	my $sth = $dbh->prepare("SELECT * FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! cdcc768d $DBI::errstr\n";	# bereitet den befehl vor
+	my $sth = $dbh->prepare("SELECT * FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! cdcc768d $DBI::errstr\n";	# bereitet den befehl vor
 	$sth->execute();
 	if (my @row = $sth->fetchrow_array()) {
 		printFehler("Loginname bereits vorhanden!");
@@ -1230,12 +1230,12 @@ sub create_user {
 		$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! 04142d72 $DBI::errstr\n";
 		$sth->execute() || die "Fehler bei der Datenverarbeitung! 8120adbf $DBI::errstr\n";
 		$sth = $dbh->prepare("SELECT MAX(id) FROM users")|| die "Fehler bei der Datenverarbeitung! a28aa67b $DBI::errstr\n";	# bereitet den befehl vor
-	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! f37067ad $DBI::errstr\n";
+		$sth->execute() || die "Fehler bei der Datenverarbeitung! f37067ad $DBI::errstr\n";
 		my @row = $sth->fetchrow_array();
 		$sth = $dbh->prepare("INSERT INTO finanzlog VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW(), '0')")|| die "Fehler bei der Datenverarbeitung! f8561970 $DBI::errstr\n";	# bereitet den befehl vor
-	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! 59427184 $DBI::errstr\n";
-	  	$sth = $dbh->prepare("INSERT INTO waschagtransaktionen VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW())")|| die "Fehler bei der Datenverarbeitung! bd532050 $DBI::errstr\n";	# bereitet den befehl vor
-	  	$sth->execute() || die "Fehler bei der Datenverarbeitung! 114d51f4 $DBI::errstr\n";
+		$sth->execute() || die "Fehler bei der Datenverarbeitung! 59427184 $DBI::errstr\n";
+		$sth = $dbh->prepare("INSERT INTO waschagtransaktionen VALUES ('$row[0]', '0', '0', 'Account-Erstellung', NOW())")|| die "Fehler bei der Datenverarbeitung! bd532050 $DBI::errstr\n";	# bereitet den befehl vor
+		$sth->execute() || die "Fehler bei der Datenverarbeitung! 114d51f4 $DBI::errstr\n";
 		$sth = $dbh->prepare("SELECT id FROM users WHERE login = ".vorbereiten($login))|| die "Fehler bei der Datenverarbeitung! 15c981c4 $DBI::errstr\n";	# bereitet den befehl vor
 		$sth->execute();
 		@row = $sth->fetchrow_array();
@@ -1257,16 +1257,16 @@ sub userVerwaltung {
 	print <<ENDE_DES_STRINGS;
 <script type="text/javascript">
 JumpFlag=1;
-function go2next(CurrentInp) 
-{ 
-with (CurrentInp) 
+function go2next(CurrentInp)
+{
+with (CurrentInp)
 {
 if ( (value.length==maxLength) && (tabIndex<=document.FX.elements.length-1) )
 {
 	document.FX.elements[tabIndex].focus();
 }
 }
-} 
+}
 	</script>
 ENDE_DES_STRINGS
 
@@ -1434,7 +1434,7 @@ sub gibEditForm {
 	my $lastlogin = shift;
 	my $jetzt = gibDatumString(0);
 
-	
+
 	print "<form action=\"$skript?aktion=do_edit&id=$id\" method=\"post\">";
 	print "<table style='border: 0px;'><tr><td>Vorname:</td><td><input name=\"name\" size=\"30\" value=\"$name\"></td></tr>";
 	print "<tr><td>Nachname:</td><td><input name=\"nachname\" size=\"30\" value=\"$nname\"></td></tr>";
@@ -1474,11 +1474,11 @@ sub do_edit {
 	my $bemerkung = $cgi->param('bemerkung');
 	my $termine = $cgi->param('termine');
 	my $ok = notLeer($login, 'Loginname')
-				 + notLeer($name, 'Vorname')
-				 + notLeer($nname, 'Nachname')
-				 + notLeer($login, 'Loginname')
-				 + isValidZimmer($zimmer, 'Zimmer')
-				 + isValidIP($ip, 'IP');
+				+ notLeer($name, 'Vorname')
+				+ notLeer($nname, 'Nachname')
+				+ notLeer($login, 'Loginname')
+				+ isValidZimmer($zimmer, 'Zimmer')
+				+ isValidIP($ip, 'IP');
 
 	if (darf_bearbeiten($id) == 0){
 		printFehler("Status ung&uuml;ltig! Status muss kleiner als dein eigener sein, au&szlig;er du bearbeitest dich selber!");
@@ -1530,7 +1530,6 @@ sub do_edit {
 		if ($pw ne "pwchange") {
 			$change = "";
 		} else {
-			
 			$pw = genPw();
 			printFehler("<br>Es wurde folgendes Passwort generiert: <b>$pw</b> <br>");
 			$pw = crypt($pw, "ps");
@@ -2175,23 +2174,23 @@ sub maschineSetConfig {
 				for(my $i = 1; $i <= $anzahlMaschinen && $verschoben == 0; $i++) {
 					if($i != $W_Id) {
 						my $sql = $dbh->prepare("SELECT * FROM termine WHERE maschine = '$i' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! 92c56d99 $DBI::errstr\n";
-			  		$sql->execute();
-			  		my @row2 = $sql->fetchrow_array();
-			  		if(scalar(@row2) == 0) {
-			  			$sql = $dbh->prepare("SELECT status FROM waschmaschinen WHERE id = '$i'")|| die "Fehler bei der Datenverarbeitung! 2dbc2e0e $DBI::errstr\n";
-			  			$sql->execute();
-			  			@row2 = $sql->fetchrow_array();
-			  			if ($row2[0] == 1){
-			  				my $sql = $dbh->prepare("UPDATE termine SET maschine='$i' WHERE maschine = '$W_Id' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! 9934710c $DBI::errstr\n";
-			  		  	$sql->execute();
-			  		  	benachrichtige($row[2], "Ein Termin von dir wurde auf eine andere Maschine verlegt. Bitte beachten!");
-			  		  	$verschoben = 1;
-			  		  }
-			  		}
-			  	}
-			  }
-		  	if($verschoben == 0) {
-		  		my $preis = getPreis($row[0], $row[1]);
+				$sql->execute();
+				my @row2 = $sql->fetchrow_array();
+				if(scalar(@row2) == 0) {
+					$sql = $dbh->prepare("SELECT status FROM waschmaschinen WHERE id = '$i'")|| die "Fehler bei der Datenverarbeitung! 2dbc2e0e $DBI::errstr\n";
+					$sql->execute();
+					@row2 = $sql->fetchrow_array();
+					if ($row2[0] == 1){
+						my $sql = $dbh->prepare("UPDATE termine SET maschine='$i' WHERE maschine = '$W_Id' AND datum = '$row[3]' AND zeit = '$row[1]'")|| die "Fehler bei der Datenverarbeitung! 9934710c $DBI::errstr\n";
+						$sql->execute();
+						benachrichtige($row[2], "Ein Termin von dir wurde auf eine andere Maschine verlegt. Bitte beachten!");
+						$verschoben = 1;
+					}
+				}
+			}
+		}
+		if($verschoben == 0) {
+			my $preis = getPreis($row[0], $row[1]);
 					geldbewegung($row[2], $preis, "Erstattung wegen Terminausfalls (Sperrung Maschine $W_Id)");
 					benachrichtige($row[2], "Ein Termin von dir wurde storniert. Bitte beachten!");
 					my $sth2 = $dbh->prepare("UPDATE users SET termine = termine - 1 WHERE id = '$row[2]'")|| die "Fehler bei der Datenverarbeitung! d8684495 $DBI::errstr\n";
@@ -2438,7 +2437,6 @@ sub look_termine {
 					}
 				}
 			}
-			
 		}
 		print "</tr>";
 	}
@@ -2613,7 +2611,7 @@ sub stornieren {
 			} else {
 				my $preis = getPreis($row[1], $zeit);
 				my $bonuspreis = 0;
-				if($row[2] != 0) 
+				if($row[2] != 0)
 				{
 					# das ist ein bonustermin
 					$bonuspreis = $preis;
@@ -2969,7 +2967,6 @@ sub look_old_data() {
 		$output = substr($output, 2);
 		my @files = split('\n./', $output);
 		@files = sort(@files);
-		
 		foreach(@files) {
 			print "<a href=\"$skript?aktion=look_old_data&dir=$active_dir&file=$_\">$_</a><br>";
 		}
