@@ -1,4 +1,5 @@
-#include <iostream>
+#include <stdexcept>
+#include <QDebug>
 #include <QShortcut>
 #include <QtGui>
 #include <QInputDialog>
@@ -188,7 +189,7 @@ void TerminVerwaltung::printTabelle() {
 
 void TerminVerwaltung::gibMeldung(QString nachricht) {
 	nachricht = QDateTime::currentDateTime().toString() + ": " + nachricht;
-   std::cout << nachricht.toLatin1().data() << std::endl;
+   qDebug() << nachricht;
    QString temp;
    for (int i = 4; i > 0; i--){
       sagEs[i] = sagEs[i-1];
@@ -641,7 +642,12 @@ bool TerminVerwaltung::stornIfNecessary(int wochentag, int zeit, int user, QStri
 		   // XXX no test for refund already made
 		   QString anfrage = "INSERT INTO finanzlog (`user`, bestand, aktion, bemerkung, datum, bonus) VALUES('" + QString::number(user) + "', '" + QString::number(neubestand) + "', '" + QString::number(preis) +
 				   "', 'Auto-Storno Termin am " + datum + " um " + gibWaschTermin(zeit) + " (Termin nicht wahrgenommen)' , NOW(), " + QString::number(bonusbestand) + ")";
-		   exec(anfrage, "Fehler beim Stornieren!");
+		   try {
+			exec(anfrage, "Fehler beim Stornieren!");
+		   } catch (const std::runtime_error& e) {
+			qDebug() << e.what();
+			return false;
+		   }
       } else return false;
    } else return false;
    sleep(1);
@@ -672,36 +678,36 @@ TerminVerwaltung::~TerminVerwaltung() {
 
 QSqlQuery TerminVerwaltung::multiquery(QString anfrage, const char* error) {
 	if (!verbindeDB())
-		throw QString("Datenbank nicht verfügbar.");
+		throw std::runtime_error(QString("Datenbank nicht verfügbar.").toStdString());
 	QSqlQuery qry(db);
 	if (!qry.prepare(anfrage))
-		throw QString(error) + QString(" Query korrupt: ") + anfrage;
+		throw std::runtime_error((QString(error) + QString(" Query korrupt: ") + anfrage).toStdString());
 	if (!qry.exec())
-		throw QString(error) + QString(" Query nicht ausgeführt: ") + anfrage;
+		throw std::runtime_error((QString(error) + QString(" Query nicht ausgeführt: ") + anfrage).toStdString());
 	return qry;
 }
 
 QSqlQuery TerminVerwaltung::fetch(QString anfrage, const char* error) {
 	if (!verbindeDB())
-		throw QString("Datenbank nicht verfügbar.");
+		throw std::runtime_error(QString("Datenbank nicht verfügbar.").toStdString());
 	QSqlQuery qry(db);
 	if (!qry.prepare(anfrage))
-		throw QString(error) + QString(" Query korrupt: ") + anfrage;
+		throw std::runtime_error((QString(error) + QString(" Query korrupt: ") + anfrage).toStdString());
 	if (!qry.exec())
-		throw QString(error) + QString(" Query nicht ausgeführt: ") + anfrage;
-    if (!qry.next())
-    	throw QString(error) + QString(" Result leer: ") + anfrage;
+		throw std::runtime_error((QString(error) + QString(" Query nicht ausgeführt: ") + anfrage).toStdString());
+	if (!qry.next())
+		throw std::runtime_error((QString(error) + QString(" Result leer: ") + anfrage).toStdString());
 	return qry;
 }
 
 void TerminVerwaltung::exec(QString anfrage, const char* error) {
 	if (!verbindeDB())
-		throw QString("Datenbank nicht verfügbar.");
+		throw std::runtime_error(QString("Datenbank nicht verfügbar.").toStdString());
 	QSqlQuery qry(db);
 	if (!qry.prepare(anfrage))
-		throw QString(error) + QString(" Query korrupt: ") + anfrage;
+		throw std::runtime_error((QString(error) + QString(" Query korrupt: ") + anfrage).toStdString());
 	if (!qry.exec())
-		throw QString(error) + QString(" Query nicht ausgeführt: ") + anfrage;
+		throw std::runtime_error((QString(error) + QString(" Query nicht ausgeführt: ") + anfrage).toStdString());
 }
 
 
