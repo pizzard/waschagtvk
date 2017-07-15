@@ -732,5 +732,3 @@ void TerminVerwaltung::exec(QString anfrage, const char* error) {
 	if (!qry.exec())
 		throw std::runtime_error((QString(error) + QString(" Query nicht ausgeführt: ") + anfrage).toStdString());
 }
-
-
