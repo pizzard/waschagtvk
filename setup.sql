@@ -90,9 +90,9 @@ CREATE TABLE doku_deu (
   id SERIAL PRIMARY KEY
 );
 INSERT INTO users (login,pw,status) VALUES ('w','b',9);
-INSERT INTO waschmaschinen (id,status) VALUES (0,0);
-INSERT INTO waschmaschinen (id,status) VALUES (1,1);
-INSERT INTO waschmaschinen (id,status) VALUES (2,2);
+INSERT INTO waschmaschinen (id,status) VALUES (1,0);
+INSERT INTO waschmaschinen (id,status) VALUES (2,1);
+INSERT INTO waschmaschinen (id,status) VALUES (3,2);
 INSERT INTO config (zweck, wert) VALUES
   ( "Stornierzeit (in Min)",    5 ),
   ( "Antrittszeit (in Min)",   15 ),
