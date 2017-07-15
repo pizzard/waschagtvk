@@ -638,7 +638,8 @@ bool TerminVerwaltung::stornIfNecessary(int wochentag, int zeit, int user, QStri
 			   neubestand -= (preis);
 			   bonusbestand += (preis);
 		   }
-		   QString anfrage = "INSERT INTO finanzlog VALUES('" + QString::number(user) + "', '" + QString::number(neubestand) + "', '" + QString::number(preis) +
+		   // XXX no test for refund already made
+		   QString anfrage = "INSERT INTO finanzlog (`user`, bestand, aktion, bemerkung, datum, bonus) VALUES('" + QString::number(user) + "', '" + QString::number(neubestand) + "', '" + QString::number(preis) +
 				   "', 'Auto-Storno Termin am " + datum + " um " + gibWaschTermin(zeit) + " (Termin nicht wahrgenommen)' , NOW(), " + QString::number(bonusbestand) + ")";
 		   exec(anfrage, "Fehler beim Stornieren!");
       } else return false;
