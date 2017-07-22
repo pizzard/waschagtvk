@@ -7,12 +7,14 @@
 #include <QMessageBox>
 #include <QFont>
 #include <QVariant>
+#include <QByteArray>
 #include <QSqlRecord>
 #include "WashingProgram.h"
 #include "TerminVerwaltung.h"
 #include "Hilfsfunktionen.h"
 #include "relais.h"
 #include "crypt.h"
+#include "LegacyEncodingUtil.h"
 #include <exception>
 
 // Zuordnung der Maschinen
@@ -22,6 +24,19 @@ const std::array<const int,3> TerminVerwaltung::maschinenNr{
 	2,  // Maschine 2 an Relais 2
 	3   // Maschine 3 an Relais 3
 };
+
+QString doubleDecode(QString in) {
+	/* this wont work:
+	QString::fromUtf8(QString::fromUtf8(in.toLatin1()).toLatin1());
+	*/
+	return QString::fromStdString(
+			legacyenc::decode(legacyenc::decode(in.toStdString())));
+}
+
+QByteArray doubleEncode(QString in) {
+	return QByteArray::fromStdString(
+			legacyenc::encode(legacyenc::encode(in.toStdString())));
+}
 
 TerminVerwaltung::TerminVerwaltung(QWidget *parent):
 	QWidget(parent),
@@ -184,7 +199,7 @@ void TerminVerwaltung::printTabelle() {
 	   q.next(); // We know this exists
 	   int zeile = qry.value(2).toInt()==davor?0:(qry.value(2).toInt()==zeit?1:2);
 	   int spalte = qry.value(1).toInt();
-	   tabelle[spalte][zeile]->setText(QString::fromUtf8(q.value(1).toString().toLatin1()) + ", " + QString::fromUtf8(q.value(0).toString().toLatin1()) + "   Zi. " + q.value(2).toString());
+	   tabelle[spalte][zeile]->setText(doubleDecode(q.value(1).toString()) + ", " + doubleDecode(q.value(0).toString()) + "   Zi. " + q.value(2).toString());
    }
 }
 
@@ -227,7 +242,7 @@ void TerminVerwaltung::iWannaWash() {
 		// Loginname
 		if (ok) {
 			ok = false;
-			QString anfrage = "SELECT id, pw FROM users WHERE login = '" + login.toUtf8() + "'";
+			QString anfrage = "SELECT id, pw FROM users WHERE login = '" + doubleEncode(login) + "'";
 			QSqlQuery qry = multiquery(anfrage, "Fehler beim Login!");
 			if (qry.next()) {
 				id = qry.value(0).toInt();
@@ -243,11 +258,13 @@ void TerminVerwaltung::iWannaWash() {
 			if (ok) {
 				ok = false;
 				char* buf = new char[66];
+				// qDebug() << "entered " << pw;
 				pw = QString(crypt_r(pw.toUtf8().data(), "ps", buf));
 				if (pw == pwFromDb) {
 					ok = true;
 				} else {
 					QMessageBox::critical(this, QString("Passwort falsch!"), QString("Das eigegebene Passwort ist inkorrekt!\n Vielleicht hast du dich vertippt?"), QMessageBox::Ok);
+					// qDebug() << "expected " << pwFromDb << ", given " << pw;
 				}
 				delete [] buf;
 			}
@@ -423,7 +440,7 @@ bool TerminVerwaltung::speicherAlleFinanzen() {
    QSqlQuery qry = multiquery("SELECT id, name, nachname FROM users", "Fehler beim Speichern der Finanzen!");
    while (qry.next()) {
 	   buffer = "";
-	   dateiname = "./finanzlog/" + QString::fromUtf8(qry.value(2).toString().toLatin1()) + "_" + QString::fromUtf8(qry.value(1).toString().toLatin1()) + "_" + qry.value(0).toString() + ".txt";
+	   dateiname = "./finanzlog/" + doubleDecode(qry.value(2).toString()) + "_" + doubleDecode(qry.value(1).toString()) + "_" + qry.value(0).toString() + ".txt";
 	   QFile datei(dateiname, this);
 	   if (QFile::exists(dateiname)) {
 	   } else {
@@ -434,7 +451,7 @@ bool TerminVerwaltung::speicherAlleFinanzen() {
 	   QSqlQuery q = multiquery(anfrage, "Fehler beim Speichern der Finanzen!" );
 	   while (q.next()) {
 		   count++;
-		   buffer += q.value(3).toString() + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " +  QString::fromUtf8(q.value(2).toString().toLatin1()) + " \n";
+		   buffer += q.value(3).toString() + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " +  doubleDecode(q.value(2).toString()) + " \n";
 	   }
 	   anfrage = "DELETE FROM finanzlog WHERE user = '" + qry.value(0).toString() + "' AND datum < DATE_SUB(CURDATE(), INTERVAL " + QString::number(vorhaltezeit) + " MONTH) ORDER BY datum ASC LIMIT " + QString::number(count);
 	   exec(anfrage, "Fehler beim Speichern der Finanzen!");
@@ -460,7 +477,7 @@ bool TerminVerwaltung::speicherWaschAgFinanzen() {
       QSqlQuery qry = multiquery(anfrage, "Fehler beim Speichern der WaschAG-Finanzen!");
       while (qry.next()) {
     	  buffer = "";
-    	  dateiname = "./waschagtransaktionen/" + QString::fromUtf8(qry.value(2).toString().toLatin1()) + "_" + QString::fromUtf8(qry.value(1).toString().toLatin1()) + "_" + qry.value(0).toString() + ".txt";
+    	  dateiname = "./waschagtransaktionen/" + doubleDecode(qry.value(2).toString()) + "_" + doubleDecode(qry.value(1).toString()) + "_" + qry.value(0).toString() + ".txt";
     	  QFile datei(dateiname, this);
     	  if (QFile::exists(dateiname)) {
     	  } else {
@@ -471,7 +488,7 @@ bool TerminVerwaltung::speicherWaschAgFinanzen() {
     	  int count = 0;
     	  while (q.next()) {
     		  count++;
-    		  buffer += q.value(3).toString() + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " +  QString::fromUtf8(q.value(2).toString().toLatin1()) + " \n";
+    		  buffer += q.value(3).toString() + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " +  doubleDecode(q.value(2).toString()) + " \n";
     	  }
     	  anfrage = "DELETE FROM waschagtransaktionen WHERE user = '" + qry.value(0).toString() + "' AND datum < DATE_SUB(CURDATE(), INTERVAL " + QString::number(WAGvorhaltezeit) + " MONTH) ORDER BY datum ASC LIMIT " + QString::number(count);
     	  exec(anfrage, "Fehler beim Speichern der WaschAG-Finanzen!");
@@ -701,7 +718,8 @@ QSqlQuery TerminVerwaltung::multiquery(QString anfrage, const char* error) {
 			}
 		} else {
 			for(int i=0; i<n; ++i) {
-				valstr += qry.value(i).toString() + ", ";
+				auto bstr = qry.value(i).toString();
+				valstr += doubleDecode(bstr) + ", ";
 			}
 		}
 		qDebug() << "(" << valstr << "), ";
