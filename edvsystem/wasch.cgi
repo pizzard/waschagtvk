@@ -328,6 +328,13 @@ sub checkPW {
 }
 
 
+# to be used for making terminhash
+sub getUserHash {
+	my ($login, $pw) = @_;
+	return sha1_hex($pw.$login);
+}
+
+
 # validiert ob pw und login legal sind
 # param login
 # param pw
@@ -346,7 +353,7 @@ sub validate {
 	if (decode("utf-8", $row[0]) eq $pw) {
 		if ($ip eq decode("utf-8", $row[1]) || $ip eq $superuser || $login eq "\'".$adminsName."\'") {
 			# Login erfolgreich, generiere hash
-			$terminhash = sha1_hex(decode("utf-8", $row[0]).$row[5]);
+			$terminhash = getUserHash($row[5], $pw);
 			return(1);
 		}
 		if ($ip eq $tvkurt) {
