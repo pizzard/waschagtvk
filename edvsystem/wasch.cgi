@@ -2374,7 +2374,9 @@ sub look_termine {
 		$maschine[$count] = $m0[0];
 	}
 	# Start Formular
-	print "Link f&uuml;r den iCal-Export aufs Smartphone: <a href=\"$edvhost/terminexport.php?id=$terminhash\">$edvhost/terminexport.php?id=$terminhash</a>";
+	if ($terminhash) {
+		print "Link f&uuml;r den iCal-Export aufs Smartphone: <a href=\"$edvhost/terminexport.php?id=$terminhash\">$edvhost/terminexport.php?id=$terminhash</a>";
+	}
 	print "<table class=\"table table-hover\" cellspacing=\"10\" cellpadding=\"0\" width=\"100%\"><colgroup>";
 	print "<col width=\"9%\"><col width=\"13%\"><col width=\"13%\"><col width=\"13%\">";
 	print "<col width=\"13%\"><col width=\"13%\"><col width=\"13%\"><col width=\"13%\">";
