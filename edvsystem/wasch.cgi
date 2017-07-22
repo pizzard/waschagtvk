@@ -28,7 +28,7 @@ our $exWaschag = 3; # Status: ehemaliges WaschAG-Mitglied
 our $user = 1; # Status: User
 our $wartung = 0; # 1 sperrt das gesamte System fÃ¼r alle User auÃŸer WaschAG + Admin
 our $godWartung = 0; # 1 sperrt das gesamte System für alle User außer Admin
-our $unsafe = 0; # 1 skips all password checks, DANGEROUS, only for testing
+our $unsafe = 1; # 1 skips all password checks, DANGEROUS, only for testing
 our $superuser = "137.226.143.7";
 our $tvkurt = "137.226.143.4"; #TvKurt Adresse
 our $maxBetrag = 100; #Betrag, den ein User maximal einzahlen darf
@@ -61,7 +61,7 @@ my $dbh;
 my $cfg = Config::IniFiles->new( -file => "./inc/config.ini" );
 our $edvhost = $cfg->val("wasch","host");
 #$dbh = DBI->connect($cfg->val("wasch","db"),$cfg->val("wasch","user"),$cfg->val("wasch","pw")) or die $dbh->errstr();
-$dbh = DBI->connect($cfg->val("wasch","db"),$cfg->val("wasch","user")) or die $DBI::errstr;
+$dbh = DBI->connect($cfg->val("wasch","db"),$cfg->val("wasch","user"),$cfg->val("wasch","password")) or die $DBI::errstr;
 
 
 # Start HTML
@@ -602,7 +602,7 @@ sub benachrichtige {
 # Kopf jeder Seite, implementiert das Design der Netz-AG
 sub print_header {
 	print "Content-type: text/html\n\n";
-	open (START, " /var/www/start.inc");
+	open (START, " /var/www/html/start.inc");
 	my @file = <START>;
 	print @file;
 	close (START);
@@ -626,10 +626,6 @@ sub print_footer {
 	print "<tr><td style=\"text-align: left\"> $progName $version</td><td style=\"text-align: right\">by $godsName </td></tr>";
 	print "<tr><td colspan=2><b>(1)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
 	print "</body>";
-	open (ENDE, "/var/www/start.inc");
-	my @file = <ENDE>;
-	print @file;
-	close (ENDE);
 }
 
 # Titelleiste
@@ -1149,7 +1145,7 @@ sub create_user {
 		$pw = genPw();
 		printFehler("<br>Es wurde folgendes Passwort generiert: <b>$pw</b> <br>");
 		$pw = crypt($pw, "ps");
-		my $sql = "INSERT INTO users ( id , name , nachname , pw , login , zimmer , gesperrt , message , ip , status, von ) VALUES ('', '$name', '$nname', '$pw', '$login', '$zimmer', '0', '', '$ip', '1' , '$gId')";
+		my $sql = "INSERT INTO users ( name , nachname , pw , login , zimmer , gesperrt , message , ip , status, von ) VALUES ( '$name', '$nname', '$pw', '$login', '$zimmer', '0', '', '$ip', '1' , '$gId')";
 		$sth = $dbh->prepare($sql) || die "Fehler bei der Datenverarbeitung! 04142d72 $DBI::errstr\n";
 		$sth->execute() || die "Fehler bei der Datenverarbeitung! 8120adbf $DBI::errstr\n";
 		$sth = $dbh->prepare("SELECT MAX(id) FROM users")|| die "Fehler bei der Datenverarbeitung! a28aa67b $DBI::errstr\n";	# bereitet den befehl vor
@@ -1176,7 +1172,7 @@ sub userVerwaltung {
 	my $sortierung = $cgi->url_param('sort');
 	my $zimmernummer= $cgi->url_param('zimmer');
 	my $etagennummer= $cgi->url_param('etage');
-	my $zimmer_add = "1";
+	my $zimmer_add = "TRUE";
 	print <<ENDE_DES_STRINGS;
 <script type="text/javascript">
 JumpFlag=1;
@@ -1353,7 +1349,7 @@ sub gibEditForm {
 	my $sperre = shift;
 	my $nachricht = decode("utf-8",shift);
 	my $bemerkung = decode("utf-8",shift);
-	my $termine = shift;
+	my $termine = shift || "0";
 	my $lastlogin = shift;
 	my $jetzt = Dateutils::gibDatumString(0);
 
@@ -2055,7 +2051,8 @@ sub maschinenVerwaltung {
 		normalTabellenZeileKopf("black", @contents);
 		print "<form action=\"$skript?aktion=set_config\" method=\"post\">";
 		@row = $sth->fetchrow_array();
-		my $antritt = "<input name=\"antritt\" size=\"10\" value=\"$row[0]\">";
+		$i--;
+		my $antritt = "<label for=\"antritt\">$contents[$i]</label><input name=\"antritt\" size=\"10\" value=\"$row[0]\" />";
 		@row = $sth->fetchrow_array();
 		my $freigeld = "<input name=\"freigeld\" size=\"10\" value=\"$row[0]\">";
 		@row = $sth->fetchrow_array();
@@ -2195,7 +2192,8 @@ sub preisListe {
 		$sth->execute();
 		for (my $k = 0; $k <= 6; $k++) {
 			@row = $sth->fetchrow_array();
-			print "<td style=\"text-align: center\"><input name=\"T$k$i\" size=\"4\" value=\"$row[0]\"> Euro</td>";
+			my $val = $row[0] || "0";
+			print "<td style=\"text-align: center\"><input name=\"T$k$i\" size=\"4\" value=\"$val\"> Euro</td>";
 		}
 		print "</tr>";
 	}
