@@ -38,8 +38,20 @@ QByteArray doubleEncode(QString in) {
 			legacyenc::encode(legacyenc::encode(in.toStdString())));
 }
 
+QString init_sagEs(std::array<QString,5>& sagEs) {
+	QString message;
+	sagEs[0] = "Programm Waschente (1.2) gestartet!";
+	message += QString("Programm Waschente (1.2) gestartet!") + "\n";
+	for (int i = 1; i < 5; i++){
+		sagEs[i] = QString("");
+		message += QString("") + "\n";
+	}
+	return message;
+}
+
 TerminVerwaltung::TerminVerwaltung(QWidget *parent):
 	QWidget(parent),
+	db(QSqlDatabase::addDatabase("QMYSQL")),
 	timer(this),
 	timer2(this),
 	messageBox("Nachrichtenfenster"),
@@ -47,14 +59,7 @@ TerminVerwaltung::TerminVerwaltung(QWidget *parent):
 {
 	// Das Nachrichtenfenster
 	QFont message_schrift("Arial", 12, QFont::Bold);
-	QString temp;
-	sagEs[0] = "Programm Waschente (1.2) gestartet!";
-	temp += QString("Programm Waschente (1.2) gestartet!") + "\n";
-	for (int i = 1; i < 5; i++){
-		sagEs[i] = QString("");
-		temp += QString("") + "\n";
-	}
-	message.setText(temp);
+	message.setText(init_sagEs(sagEs));
 	message.setFont(message_schrift);
 	message.setWordWrap(true);
 	messageLayout.addWidget(&message);
@@ -71,83 +76,84 @@ TerminVerwaltung::TerminVerwaltung(QWidget *parent):
 
 	connect(&control, SIGNAL(clicked()), this, SLOT(iWannaWash()));
 
-	db = QSqlDatabase::addDatabase("QMYSQL");
-
-	try{
-		getMaschinen();
-		getConfig();
-	}
-	catch(std::exception& e)
-	{
-		gibMeldung(e.what());
-	}
-
-	box.resize(anzahl + 1);
-
-	box.front().reset(new QGroupBox("Uhrzeit"));
-	for (int i = 1; i <= anzahl; i++) {
-		box[i].reset(new QGroupBox("Maschine " + QString::number(i)));
-	}
-
-	tabelle.resize(anzahl + 1);
-	for (int i = 0; i <= anzahl; i++) {
-		for (int k = 0; k < 3; k++) {
-			tabelle[i][k].reset(new QLabel("Keine Informationen geladen!"));
-			tabelle[i][k]->setWordWrap(true);
-		}
-	}
-
-	QFont schrift[4] = {QFont("Arial", 12), QFont("Arial", 16, QFont::Bold), QFont("Arial", 12), QFont("Arial", 14, QFont::Bold)}; //Schriftart f�r Termin davor, Termin, Termin danach, Titel
-
-
-	for (int i = 0; i <= anzahl; i++) {
-		box[i]->setFont(schrift[3]);
-		for (int k = 0; k < 3; k++) {
-			tabelle[i][k]->setFont(schrift[k]);
-		}
-	}
-
-	for(int i = 0; i < anzahl; i++) {
-		aktStatus[i] = false;
-	}
-
-	layout.resize(anzahl + 1);
-	for (int i = 0; i <= anzahl; i++) {
-		layout[i].reset(new QVBoxLayout());
-		for (int k = 0; k < 3; k++) {
-			layout[i]->addWidget(tabelle[i][k].get()); //HIER FEHLER?
-		}
-		box[i]->setLayout(layout[i].get());
-		layout_grid.addWidget(box[i].get(), 0, i);
-	}
-
-	layout_grid.addWidget(&balken, 1, 0, 1, anzahl+1);
-	layout_grid.addWidget(&balkenText, 1, 0, 1, anzahl+1);
-	layout_grid.addWidget(&messageBox, 2, 0, 1, anzahl+1);
-	layout_grid.addWidget(&control, 3, 0, 1, anzahl+1);
-	setLayout(&layout_grid);
-
 	connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
 	//   connect(short_alt_f4, SIGNAL(activated()), this, SLOT(shortcutWarning()));
 
-	timer.start(20000);
-
 	connect(&timer2, SIGNAL(timeout()), this, SLOT(checkeMaschinen()));
-	timer2.start(2000);
 
+	//Schriftart for Termin davor, Termin, Termin danach, Titel
+	QFont schrift[] = {
+		QFont("Arial", 12), QFont("Arial", 16, QFont::Bold),
+		QFont("Arial", 12), QFont("Arial", 14, QFont::Bold)}; 
+	run(*this, schrift);
+}
 
-	try {
-		printTabelle();
+void TerminVerwaltung::run(TerminVerwaltung& tver, const QFont schrift[]) {
+	try{
+		tver.getMaschinen();
+		tver.getConfig();
 	}
 	catch(std::exception& e)
 	{
-		gibMeldung(e.what());
+		tver.gibMeldung(e.what());
+	}
+	const int anzahl = tver.anzahl;
+
+	tver.box.resize(anzahl + 1);
+	tver.tabelle.resize(anzahl + 1);
+	tver.layout.resize(anzahl + 1);
+
+	tver.box.front().reset(new QGroupBox("Uhrzeit"));
+	for (int i = 1; i <= anzahl; i++) {
+		tver.box[i].reset(new QGroupBox("Maschine " + QString::number(i)));
+	}
+	for (auto& b: tver.box) {
+		b->setFont(schrift[3]);
 	}
 
+	for (auto& row: tver.tabelle) {
+		for (auto& col: row) {
+			col.reset(new QLabel("Keine Informationen geladen!"));
+			col->setWordWrap(true);
+		}
+		for (int k = 0; k < 3; k++) {
+			row[k]->setFont(schrift[k]);
+		}
+	}
 
+	for(auto&& s: tver.aktStatus) {
+		s = false;
+	}
 
-	for(int i = 0; i < 3; i++) {
-		stoppeMaschine(maschinenNr[i]);
+	for (int i = 0; i <= anzahl; i++) {
+		auto& vlay = tver.layout[i];
+		vlay.reset(new QVBoxLayout());
+		for (int k = 0; k < 3; k++) {
+			vlay->addWidget(tver.tabelle[i][k].get()); //HIER FEHLER?
+		}
+		tver.box[i]->setLayout(vlay.get());
+		tver.layout_grid.addWidget(tver.box[i].get(), 0, i);
+	}
+
+	tver.layout_grid.addWidget(&tver.balken, 1, 0, 1, anzahl+1);
+	tver.layout_grid.addWidget(&tver.balkenText, 1, 0, 1, anzahl+1);
+	tver.layout_grid.addWidget(&tver.messageBox, 2, 0, 1, anzahl+1);
+	tver.layout_grid.addWidget(&tver.control, 3, 0, 1, anzahl+1);
+	tver.setLayout(&tver.layout_grid);
+
+	tver.timer.start(3*60*100);
+	tver.timer2.start(20*100);
+
+	try {
+		tver.printTabelle();
+	}
+	catch(std::exception& e)
+	{
+		tver.gibMeldung(e.what());
+	}
+
+	for(auto mNr: tver.maschinenNr) {
+		tver.stoppeMaschine(mNr);
 	}
 }
 

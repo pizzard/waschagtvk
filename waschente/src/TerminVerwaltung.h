@@ -73,6 +73,7 @@ public slots:
 	
 
 private:
+	static void run(TerminVerwaltung& terminVerwaltung, const QFont schrift[]);
 	bool verbindeDB();
 	void gibMeldung(QString nachricht);
 	void getConfig();
