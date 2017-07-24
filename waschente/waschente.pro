@@ -7,6 +7,7 @@ INCLUDEPATH += . \
     src
 QT += core \
     gui \
+    concurrent \
     sql \
     network \
     widgets

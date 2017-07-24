@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <future>  // for promise
 #include <QWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -44,6 +45,7 @@ private:
 	static const std::array<const int,3> maschinenNr;	//speichert, welche Maschine welches Relais hat
 
 	QTime countdown;	//innere Uhr ;)
+	std::promise<void> initialized;
 
 	QSqlDatabase db;
 	
@@ -66,14 +68,17 @@ private:
 	QPushButton control;
 
 public slots:
+	void after_configured();
 	void update();
 	void iWannaWash();
 	void checkeMaschinen();
 	void shortcutWarning();
 	
+signals:
+	void configured();
 
 private:
-	static void run(TerminVerwaltung& terminVerwaltung, const QFont schrift[]);
+	static void run(TerminVerwaltung* terminVerwaltung);
 	bool verbindeDB();
 	void gibMeldung(QString nachricht);
 	void getConfig();
