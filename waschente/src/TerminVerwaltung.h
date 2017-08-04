@@ -40,6 +40,7 @@ private:
 	int vorhaltezeit;	//VORHALTEZEIT KONTODATEN IN MONATEN -> DB
 	int WAGvorhaltezeit;	//VORHALTEZEIT WAG-KONTODATEN IN MONATEN -> DB
 	int aktZeit;		//aktuelle Zeit
+	bool do_delete;
 	std::vector<bool> status;		//speichert den Status der Maschinen
 	std::vector<bool> aktStatus;	//speichert Zustand des Relais
 	static const std::array<const int,3> maschinenNr;	//speichert, welche Maschine welches Relais hat

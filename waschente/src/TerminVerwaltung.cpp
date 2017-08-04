@@ -52,6 +52,7 @@ QString init_sagEs(std::array<QString,5>& sagEs) {
 
 TerminVerwaltung::TerminVerwaltung(QWidget *parent):
 	QWidget(parent),
+	do_delete(true),
 	db(QSqlDatabase::addDatabase("QMYSQL")),
 	timer(this),
 	timer2(this),
@@ -465,14 +466,18 @@ bool TerminVerwaltung::speicherAlleFinanzen() {
 		   count++;
 		   buffer += q.value(3).toString() + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " +  doubleDecode(q.value(2).toString()) + " \n";
 	   }
-	   anfrage = "DELETE FROM finanzlog WHERE user = '" + qry.value(0).toString() + "' AND datum < DATE_SUB(CURDATE(), INTERVAL " + QString::number(vorhaltezeit) + " MONTH) ORDER BY datum ASC LIMIT " + QString::number(count);
-	   exec(anfrage, "Fehler beim Speichern der Finanzen!");
 	   if (datei.open(QIODevice::Append)) {
 		   datei.write(buffer);
 		   datei.close();
 	   } else {
 		   gibMeldung("Fehler beim Speichern der Finanzen! Datei konnte nicht geschrieben werden " + dateiname);
 		   return false;
+	   }
+	   anfrage = "DELETE FROM finanzlog WHERE user = '" + qry.value(0).toString() + "' AND datum < DATE_SUB(CURDATE(), INTERVAL " + QString::number(vorhaltezeit) + " MONTH) ORDER BY datum ASC LIMIT " + QString::number(count);
+	   if(do_delete) {
+		   exec(anfrage, "Fehler beim Speichern der Finanzen!");
+	   } else {
+		   qDebug() << "not deleting: " << anfrage;
 	   }
    }
    return true;
@@ -502,8 +507,6 @@ bool TerminVerwaltung::speicherWaschAgFinanzen() {
     		  count++;
     		  buffer += q.value(3).toString() + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " +  doubleDecode(q.value(2).toString()) + " \n";
     	  }
-    	  anfrage = "DELETE FROM waschagtransaktionen WHERE user = '" + qry.value(0).toString() + "' AND datum < DATE_SUB(CURDATE(), INTERVAL " + QString::number(WAGvorhaltezeit) + " MONTH) ORDER BY datum ASC LIMIT " + QString::number(count);
-    	  exec(anfrage, "Fehler beim Speichern der WaschAG-Finanzen!");
     	  if (datei.open(QIODevice::Append)) {
     		  datei.write(buffer);
     		  datei.close();
@@ -511,6 +514,12 @@ bool TerminVerwaltung::speicherWaschAgFinanzen() {
     		  gibMeldung("Fehler beim Speichern der WaschAG-Finanzen! Datei konnte nicht geschrieben werden " + dateiname);
     		  return false;
     	  }
+    	  anfrage = "DELETE FROM waschagtransaktionen WHERE user = '" + qry.value(0).toString() + "' AND datum < DATE_SUB(CURDATE(), INTERVAL " + QString::number(WAGvorhaltezeit) + " MONTH) ORDER BY datum ASC LIMIT " + QString::number(count);
+	  if(do_delete) {
+		  exec(anfrage, "Fehler beim Speichern der WaschAG-Finanzen!");
+	  } else {
+		  qDebug() << "not deleting: " << anfrage;
+	  }
       }
    return true;
 }
@@ -518,6 +527,7 @@ bool TerminVerwaltung::speicherWaschAgFinanzen() {
 bool TerminVerwaltung::speicherFirewall() {
    QByteArray buffer = QByteArray();
    QString dateiname;
+   QString anfrage;
    QDir directory = QDir::current();
    if (!directory.exists("securitylog")) {
       directory.mkdir("securitylog");
@@ -531,7 +541,7 @@ bool TerminVerwaltung::speicherFirewall() {
 	   } else {
 		   buffer += "Datum\tNachname\tVorname\tZugriffsversuch\n";
 	   }
-	   QString anfrage = "SELECT nachname, name FROM users WHERE id = '" + qry.value(1).toString() + "'";
+	   anfrage = "SELECT nachname, name FROM users WHERE id = '" + qry.value(1).toString() + "'";
 	   QSqlQuery q = multiquery(anfrage, "Fehler beim Speichern des Firewalllogs!");
 	   while (q.next()) {
 		   buffer += qry.value(0).toString() + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " +  qry.value(2).toString() + " \n";
@@ -544,7 +554,12 @@ bool TerminVerwaltung::speicherFirewall() {
 		   return false;
 	   }
    }
-   exec("DELETE FROM notify WHERE YEAR(datum) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 YEAR))", "Fehler beim Speichern des Firewalllogs!");
+   anfrage = "DELETE FROM notify WHERE YEAR(datum) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 YEAR))";
+   if(do_delete) {
+	   exec(anfrage, "Fehler beim Speichern des Firewalllogs!");
+   } else {
+	   qDebug() << "not deleting: " << anfrage;
+   }
    return true;
 }
 
@@ -600,7 +615,11 @@ bool TerminVerwaltung::speicherTermine() {
             		datei.close();
             		if (stornIfNecessary(qry.value(2).toInt(), qry.value(1).toInt(), qry.value(0).toInt(), QString::number(start.year()) + "-" + QString::number(start.month()) + "-" + QString::number(start.day()), qry.value(2).toBool())) {
             			anfrage = "DELETE FROM termine WHERE maschine = '" + QString::number(i) + "' AND datum = '" + QString::number(start.year()) + "-" + QString::number(start.month()) + "-" + QString::number(start.day()) + "' AND zeit = '" + qry.value(1).toString() + "'";
-            			exec(anfrage, "Fehler beim Löschen des Waschlogs!");
+				if(do_delete) {
+					exec(anfrage, "Fehler beim Löschen des Waschlogs!");
+				} else {
+					qDebug() << "not deleting: " << anfrage;
+				}
             		}
             	} else {
             		gibMeldung("Fehler beim Speichern des Waschlogs! Datei konnte nicht geschrieben werden " + dateiname);
@@ -638,7 +657,11 @@ bool TerminVerwaltung::speicherTermine() {
 			   datei.close();
 			   if (stornIfNecessary(qry.value(2).toInt(), qry.value(1).toInt(), qry.value(0).toInt(), QString::number(ende.year()) + "-" + QString::number(ende.month()) + "-" + QString::number(ende.day()), qry.value(3).toBool())) {
 				   anfrage = "DELETE FROM termine WHERE maschine = '" + QString::number(i) + "' AND datum = '" + QString::number(ende.year()) + "-" + QString::number(ende.month()) + "-" + QString::number(ende.day()) + "' AND zeit = '" + qry.value(1).toString() + "'" + gestern;
-				   exec(anfrage, "Fehler beim Löschen des Waschlogs!");
+				   if(do_delete) {
+					   exec(anfrage, "Fehler beim Löschen des Waschlogs!");
+				   } else {
+					   qDebug() << "not deleting: " << anfrage;
+				   }
 			   }
 		   } else {
 			   gibMeldung("Fehler beim Speichern des Waschlogs! Datei konnte nicht geschrieben werden " + dateiname);
