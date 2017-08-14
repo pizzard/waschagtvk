@@ -89,7 +89,7 @@ CREATE TABLE doku_deu (
   inhalt VARCHAR(16383),
   id SERIAL PRIMARY KEY
 );
-INSERT INTO users (login,pw,status) VALUES ('w','b',9);
+INSERT INTO users (login,pw,status) VALUES ('w','pszA9..xmmgb6',9);  -- pw=crypt('b','ps')
 INSERT INTO waschmaschinen (id,status) VALUES (1,0);
 INSERT INTO waschmaschinen (id,status) VALUES (2,1);
 INSERT INTO waschmaschinen (id,status) VALUES (3,2);
