@@ -14,6 +14,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QTimer>
+#include <QDir>
 #include "Hilfsfunktionen.h"
 
 // Server-Adresse DB
@@ -89,6 +90,7 @@ private:
 	void printTabelle();
 	bool speicherAlleFinanzen();
 	bool speicherTermine();
+	bool speicherTermineOfDate(QDate date, QString delete_conditions, QDir directory);
 	bool speicherFirewall();
 	bool speicherWaschAgFinanzen();
 	bool stornIfNecessary(int wochentag, int zeit, int user, QString datum, bool bonus);

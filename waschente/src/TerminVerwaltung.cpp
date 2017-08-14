@@ -564,8 +564,6 @@ bool TerminVerwaltung::speicherFirewall() {
 }
 
 bool TerminVerwaltung::speicherTermine() {
-   QByteArray buffer = QByteArray();
-   QString dateiname;
    QString gestern = "";
    QDate start;
    QDate ende;
@@ -591,85 +589,84 @@ bool TerminVerwaltung::speicherTermine() {
 
    //Behandlung alte Termine
    while (start <= ende) {
-      for (int i = 1; i <= anzahl; i++) {
-            if (!directory.exists(start.toString("yyyy_MM"))) {
-               directory.mkdir(start.toString("yyyy_MM"));
-            }
-            QString anfrage = "SELECT user, zeit, wochentag, bonus FROM termine WHERE maschine = '" + QString::number(i) + "' AND datum = '" + QString::number(start.year()) + "-" + QString::number(start.month()) + "-" + QString::number(start.day()) + "' ORDER BY zeit ASC";
-            qry = multiquery(anfrage, "Fehler beim Speichern des Waschlogs!");
-            while (qry.next()) {
-            	buffer = "";
-            	dateiname = "./waschlog/" + start.toString("yyyy_MM") + "/" + start.toString("yyyy_MM_dd") + "_Maschine_" +  QString::number(i) + ".txt";
-            	QFile datei(dateiname, this);
-            	if (QFile::exists(dateiname)) {
-            	} else {
-            		buffer += "Zeit \t Nachname \t Name \t angetreten \n";
-            	}
-            	anfrage = "SELECT nachname, name FROM users WHERE id = '" + qry.value(0).toString() + "'";
-            	QSqlQuery q = multiquery(anfrage, "Fehler beim Speichern des Waschlogs!");
-            	while (q.next()) {
-            		buffer += gibWaschTerminTechnisch(qry.value(1).toInt()) + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " + ((qry.value(2).toInt())==8?"j":"n") + " \n";
-            	}
-            	if (datei.open(QIODevice::Append)) {
-            		datei.write(buffer);
-            		datei.close();
-            		if (stornIfNecessary(qry.value(2).toInt(), qry.value(1).toInt(), qry.value(0).toInt(), QString::number(start.year()) + "-" + QString::number(start.month()) + "-" + QString::number(start.day()), qry.value(2).toBool())) {
-            			anfrage = "DELETE FROM termine WHERE maschine = '" + QString::number(i) + "' AND datum = '" + QString::number(start.year()) + "-" + QString::number(start.month()) + "-" + QString::number(start.day()) + "' AND zeit = '" + qry.value(1).toString() + "'";
-				if(do_delete) {
-					exec(anfrage, "Fehler beim Löschen des Waschlogs!");
-				} else {
-					qDebug() << "not deleting: " << anfrage;
-				}
-            		}
-            	} else {
-            		gibMeldung("Fehler beim Speichern des Waschlogs! Datei konnte nicht geschrieben werden " + dateiname);
-            		return false;
-            	}
-            }
-      }
-      start = start.addDays(1);
+       if(!speicherTermineOfDate(start, "", directory)) {
+           return false;
+       }
+       start = start.addDays(1);
    }
 
    ende = ende.addDays(1);
    //gestern, um Spezialfall "erster Termin am Tag" abzufangen (letzter von gestern muss erhalten bleiben)
-   for (int i = 1; i <= anzahl; i++) {
-	   if (!directory.exists(ende.toString("yyyy_MM"))) {
-		   directory.mkdir(ende.toString("yyyy_MM"));
-	   }
-	   QString anfrage = "SELECT user, zeit, wochentag, bonus FROM termine WHERE maschine = '" + QString::number(i) + "' AND datum = '" + QString::number(ende.year()) + "-" + QString::number(ende.month()) + "-" + QString::number(ende.day()) + "'" + gestern + " ORDER BY zeit ASC";
-	   qry = multiquery(anfrage, "Fehler beim Speichern des Waschlogs!" );
+   return speicherTermineOfDate(ende, gestern, directory);
+}
 
-	   while (qry.next()) {
-		   buffer = "";
-		   dateiname = "./waschlog/" + ende.toString("yyyy_MM") + "/" + ende.toString("yyyy_MM_dd") + "_Maschine_" +  QString::number(i) + ".txt";
-		   QFile datei(dateiname, this);
-		   if (QFile::exists(dateiname)) {
-		   } else {
-			   buffer += "Zeit \t Nachname \t Name \t angetreten \n";
-		   }
-		   anfrage = "SELECT nachname, name FROM users WHERE id = '" + qry.value(0).toString() + "'";
-		   QSqlQuery q = multiquery(anfrage, "Fehler beim Speichern des Waschlogs!");
-		   while (q.next()) {
-			   buffer += gibWaschTerminTechnisch(qry.value(1).toInt()) + " \t " + q.value(0).toString() + " \t " + q.value(1).toString() + " \t " + ((qry.value(2).toInt())==8?"j":"n") + " \n";
-		   }
-		   if (datei.open(QIODevice::Append)) {
-			   datei.write(buffer);
-			   datei.close();
-			   if (stornIfNecessary(qry.value(2).toInt(), qry.value(1).toInt(), qry.value(0).toInt(), QString::number(ende.year()) + "-" + QString::number(ende.month()) + "-" + QString::number(ende.day()), qry.value(3).toBool())) {
-				   anfrage = "DELETE FROM termine WHERE maschine = '" + QString::number(i) + "' AND datum = '" + QString::number(ende.year()) + "-" + QString::number(ende.month()) + "-" + QString::number(ende.day()) + "' AND zeit = '" + qry.value(1).toString() + "'" + gestern;
-				   if(do_delete) {
-					   exec(anfrage, "Fehler beim Löschen des Waschlogs!");
-				   } else {
-					   qDebug() << "not deleting: " << anfrage;
-				   }
-			   }
-		   } else {
-			   gibMeldung("Fehler beim Speichern des Waschlogs! Datei konnte nicht geschrieben werden " + dateiname);
-			   return false;
-		   }
-	   }
-   }
-   return true;
+bool TerminVerwaltung::speicherTermineOfDate(QDate date, QString delete_conditions, QDir directory) {
+    QByteArray buffer = QByteArray();
+    QString dateiname;
+    for (int i = 1; i <= anzahl; i++) {
+        if (!directory.exists(date.toString("yyyy_MM"))) {
+            directory.mkdir(date.toString("yyyy_MM"));
+        }
+        QString anfrage = (
+            "SELECT user, zeit, wochentag, bonus FROM termine WHERE maschine = '"
+            + QString::number(i) + "' AND datum = '"
+            + QString::number(date.year()) + "-"
+            + QString::number(date.month()) + "-" + QString::number(date.day())
+            + "'" + delete_conditions + " ORDER BY zeit ASC");
+        QSqlQuery qry = multiquery(
+                anfrage, "Fehler beim Speichern des Waschlogs!");
+        while (qry.next()) {
+            buffer = "";
+            dateiname = date.toString("yyyy_MM") + "/"
+                + date.toString("yyyy_MM_dd") + "_Maschine_"
+                +  QString::number(i) + ".txt";
+            QFile datei(directory.path() + dateiname, this);
+            if (QFile::exists(dateiname)) {
+            } else {
+                buffer += "Zeit \t Nachname \t Name \t angetreten \n";
+            }
+            anfrage = "SELECT nachname, name FROM users WHERE id = '"
+                + qry.value(0).toString() + "'";
+            QSqlQuery q = multiquery(
+                    anfrage, "Fehler beim Speichern des Waschlogs!");
+            while (q.next()) {
+                buffer += gibWaschTerminTechnisch(qry.value(1).toInt())
+                    + " \t " + q.value(0).toString() + " \t "
+                    + q.value(1).toString() + " \t "
+                    + ((qry.value(2).toInt())==8?"j":"n") + " \n";
+            }
+            if (datei.open(QIODevice::Append)) {
+                datei.write(buffer);
+                datei.close();
+                if (stornIfNecessary(
+                            qry.value(2).toInt(), qry.value(1).toInt(),
+                            qry.value(0).toInt(),
+                            QString::number(date.year()) + "-"
+                            + QString::number(date.month()) + "-"
+                            + QString::number(date.day()),
+                            qry.value(3).toBool())
+                        ) {
+                    anfrage = "DELETE FROM termine WHERE maschine = '"
+                        + QString::number(i) + "' AND datum = '"
+                        + QString::number(date.year()) + "-"
+                        + QString::number(date.month()) + "-"
+                        + QString::number(date.day()) + "' AND zeit = '"
+                        + qry.value(1).toString() + "'" + delete_conditions;
+		    if(do_delete) {
+			exec(anfrage, "Fehler beim Löschen des Waschlogs!");
+		    } else {
+			qDebug() << "not deleting: " << anfrage;
+		    }
+                }
+            } else {
+                gibMeldung(
+                    "Fehler beim Speichern des Waschlogs! Datei konnte nicht geschrieben werden "
+		    + dateiname);
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 bool TerminVerwaltung::stornIfNecessary(int wochentag, int zeit, int user, QString datum, bool bonus) {
