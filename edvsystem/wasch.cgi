@@ -2,7 +2,7 @@
 #use strict;
 use CGI;	# CGI-Modul
 use CGI::Carp qw(fatalsToBrowser);
-use DBD::mysql;
+use DBD::Pg;
 use Apache::DBI;
 use Encode;
 use CGI qw(:standard);
