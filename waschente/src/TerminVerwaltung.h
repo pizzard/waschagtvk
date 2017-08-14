@@ -18,7 +18,7 @@
 #include "Hilfsfunktionen.h"
 
 // Server-Adresse DB
-#define SERVER "localhost"
+#define SERVER "waschdb"
 // Passwort für die DB
 #define PWORT "waschagpassword"
 // Username der DB

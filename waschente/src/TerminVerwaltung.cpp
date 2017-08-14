@@ -53,7 +53,7 @@ QString init_sagEs(std::array<QString,5>& sagEs) {
 TerminVerwaltung::TerminVerwaltung(QWidget *parent):
 	QWidget(parent),
 	do_delete(true),
-	db(QSqlDatabase::addDatabase("QMYSQL")),
+	db(QSqlDatabase::addDatabase("QPSQL")),
 	timer(this),
 	timer2(this),
 	messageBox("Nachrichtenfenster"),
