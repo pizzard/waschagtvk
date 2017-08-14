@@ -1,0 +1,28 @@
+version: '2'
+services:
+  waschdb:
+    image: "postgres:alpine"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: waschagpassword
+      POSTGRES_USER: waschag
+      POSTGRES_DB: waschag
+    restart: always
+  edvsystem:
+    build: .
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - "./edvsystem:/usr/lib/cgi-bin"
+      - "./edvsystem/inc:/var/www/localhost/htdocs"
+    links:
+      - waschdb
+    restart: always
+  waschente:
+    build: "waschente/runtime"
+    volumes:
+      - "./waschente/runtime/entehome:/entehome"
+    links:
+      - waschdb
