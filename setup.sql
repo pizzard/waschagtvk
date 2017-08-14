@@ -27,9 +27,9 @@ CREATE TABLE users (
   bemerkung VARCHAR(256),
   lastlogin TIMESTAMP,
   gotfreimarken BOOLEAN,
-  von INTEGER REFERENCES users(id),
   termine INTEGER  -- number of used appointments
 );
+ALTER TABLE users ADD von INTEGER REFERENCES users(id);
 CREATE TABLE waschmaschinen (
   id INTEGER PRIMARY KEY NOT NULL,
   status INTEGER,  -- 0: sperre (red, defekt), 1: not sperre (black, betriebsbereit), else: sperre (black)
@@ -37,7 +37,7 @@ CREATE TABLE waschmaschinen (
   von INTEGER REFERENCES users(id)
 );
 CREATE TABLE finanzlog (
-  'user' INTEGER REFERENCES users(id),  -- user is a keyword! https://dev.mysql.com/doc/refman/5.7/en/keywords.html
+  "user" INTEGER REFERENCES users(id),  -- user is a keyword! https://dev.mysql.com/doc/refman/5.7/en/keywords.html
   bestand INTEGER,
   aktion INTEGER,  -- betrag
   bemerkung VARCHAR(255),
@@ -46,16 +46,16 @@ CREATE TABLE finanzlog (
   id SERIAL PRIMARY KEY
 );
 CREATE TABLE termine (
-  'user' INTEGER REFERENCES users(id),
+  "user" INTEGER REFERENCES users(id),
   zeit INTEGER,
   maschine INTEGER REFERENCES waschmaschinen(id),
   datum DATE,
   wochentag INTEGER,
-  bonus BOOLEAN DEFAULT 0,
+  bonus BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (zeit, maschine, datum)
 );
 CREATE TABLE waschagtransaktionen (
-  'user' INTEGER REFERENCES users(id),
+  "user" INTEGER REFERENCES users(id),
   aktion INTEGER,
   bestand INTEGER,
   bemerkung VARCHAR(255),
@@ -94,11 +94,11 @@ INSERT INTO waschmaschinen (id,status) VALUES (1,0);
 INSERT INTO waschmaschinen (id,status) VALUES (2,1);
 INSERT INTO waschmaschinen (id,status) VALUES (3,2);
 INSERT INTO config (zweck, wert) VALUES
-  ( "Stornierzeit (in Min)",    5 ),
-  ( "Antrittszeit (in Min)",   15 ),
-  ( "minimaler Einzahlbetrag (in Euro)",    5 ),
-  ( "Termine pro Monat",   12 ),
-  ( "Relaiszeit (in Min)",    5 ),
-  ( "Freigeld fuer WaschAG",   12 ),
-  ( "Vorhaltezeit Kontodaten (in Monaten)",    3 ),
-  ( "Vorhaltezeit WAG-Kontodaten (in Monaten)",    8 );
+  ( 'Stornierzeit (in Min)',    5 ),
+  ( 'Antrittszeit (in Min)',   15 ),
+  ( 'minimaler Einzahlbetrag (in Euro)',    5 ),
+  ( 'Termine pro Monat',   12 ),
+  ( 'Relaiszeit (in Min)',    5 ),
+  ( 'Freigeld fuer WaschAG',   12 ),
+  ( 'Vorhaltezeit Kontodaten (in Monaten)',    3 ),
+  ( 'Vorhaltezeit WAG-Kontodaten (in Monaten)',    8 );

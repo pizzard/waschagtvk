@@ -15,10 +15,10 @@ use Dateutils;
 
 our $cgi = new CGI;	# erzeugt ein neues CGI-Objekt (damit formulare bearbeitet und HTML ausgegeben werden kann)
 our $skript = "wasch.cgi"; # Dateiname
-our $dbSetupFile = "../setup.sql";
+our $dbSetupFile = "./setup.sql";
 our $include = "inc/"; #Include-Verzeichnis
 our $progName = "WaschZoo"; # Prgrammname
-our $adminsName = "Waschross"; # Login vom Superadmin
+our $adminsName = "w"; # Login vom Superadmin
 our $god = 9; # Status: Superuser
 our $godsName = "Christian Ewald"; # Wehe da spielt jemand dran rum ;)
 our $version = "5.B"; # Versionsnummer
@@ -251,15 +251,19 @@ $dbh->disconnect;
 
 # Initialize database, DANGEROUS, only for testing!
 sub dbSetup {
+	print_header();
 	my $setup_sql = do {
 		open( my $fh, $dbSetupFile ) or die "Can't open $dbSetupFile: $!";
 		local $/ = undef;
 		<$fh>;
 	};
 	my $sth = $dbh->prepare($setup_sql) or die "Error while preparing setup sql! $DBI::errstr\n";
+	$sth->execute() or die "Error while executing setup sql! $sth->errstr\n";
 	my @row = $sth->fetchrow_array();
-	print("db_setup returned:\n");
+	print("<p>db_setup returned:<br />\n");
 	print(@row);
+	print("</p>\n");
+	return (0);
 }
 
 # Berechnet, die Distanz zwischen jetzt und Anfang Waschtermin
