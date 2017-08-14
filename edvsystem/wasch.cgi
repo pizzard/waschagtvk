@@ -15,6 +15,7 @@ use Dateutils;
 
 our $cgi = new CGI;	# erzeugt ein neues CGI-Objekt (damit formulare bearbeitet und HTML ausgegeben werden kann)
 our $skript = "wasch.cgi"; # Dateiname
+our $dbSetupFile = "../setup.sql";
 our $include = "inc/"; #Include-Verzeichnis
 our $progName = "WaschZoo"; # Prgrammname
 our $adminsName = "Waschross"; # Login vom Superadmin
@@ -239,6 +240,10 @@ if ($aktion eq 'create_user') {
 	if (kopf("shout", $waschag) == 1) {
 		massenNachricht();
 	}
+} elsif ($aktion eq 'db_setup') {
+	if ($unsafe) {
+		dbSetup();
+	}
 } else {
 	print_header();
 	Titel("Login");
@@ -250,6 +255,19 @@ $dbh->disconnect;
 
 
 # ----- HIER BEGINNT DER ABSCHNITT DER HILFSFUNKTIONEN ENTHÄLT -----
+
+# Initialize database, DANGEROUS, only for testing!
+sub dbSetup {
+	my $setup_sql = do {
+		open( my $fh, $dbSetupFile ) or die "Can't open $dbSetupFile: $!";
+		local $/ = undef;
+		<$fh>;
+	};
+	my $sth = $dbh->prepare($setup_sql) or die "Error while preparing setup sql! $DBI::errstr\n";
+	my @row = $sth->fetchrow_array();
+	print("db_setup returned:\n");
+	print(@row);
+}
 
 # Berechnet, die Distanz zwischen jetzt und Anfang Waschtermin
 sub wieLangNoch {
