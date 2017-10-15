@@ -39,6 +39,9 @@ our $anzahlMaschinen;
 our $error = ''; # temporÃ¤re Variable für diverse Fehlermeldungen
 our $terminhash = ''; # ist der has des users für den ical-export
 
+# for printLater
+our $laterMessage;
+
 # Öffnen der Datenbank
 #		my $X;
 #    open( DBINI, "< ".$include."config.ini" );
@@ -719,6 +722,7 @@ sub print_footer {
 	print "<br><br><br><table width=\"100%\" frame=\"above\" cellpadding=\"1\">";
 	print "<tr><td style=\"text-align: left\"> $progName $version</td><td style=\"text-align: right\">by $godsName </td></tr>";
 	print "<tr><td colspan=2><b>(1)</b> Du bekommst f&uuml;r jede Einzahlung ab 25 Euro eine Bonusw&auml;sche und ab 50 Euro 3 Bonusw&auml;schen!</td></tr></table>";
+	printFehler($laterMessage);
 	print "</body>";
 	open (ENDE, "/var/www/start.inc");
 	my @file = <ENDE>;
@@ -3031,4 +3035,8 @@ sub massenNachricht {
 sub printFehler {
 	my $fehler = shift;
 	print "$fehler<br>";
+}
+
+sub printLater {
+	$laterMessage .= shift;
 }
