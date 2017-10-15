@@ -389,6 +389,11 @@ sub validate {
 			benachrichtige($row[3], "Login vom TuermeRoam aus am $time");
 			return(1);
 		}
+		if ($unsafe) {
+			my $time = $row;
+			benachrichtige($row[3], "!!! Unsafe login aus am $time");
+			return(1);
+		}
 
 			#Workaround for high level no ip check
 			#if($row[2] > 4){
@@ -396,10 +401,6 @@ sub validate {
 			#}
 		$error = "IP $ip stimmt nicht. Bitte vom eigenen Rechner oder TvKurt einloggen!";
 		return (0);
-	} elsif ($unsafe) {
-		my $time = $row;
-		benachrichtige($row[3], "!!! Unsafe login aus am $time");
-		return(1);
 	} else {
 		$error = "Passwort falsch!";
 		return(0);
