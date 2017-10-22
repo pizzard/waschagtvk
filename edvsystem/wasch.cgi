@@ -1142,8 +1142,8 @@ sub changePW {
 	print "<form action=\"$skript?aktion=do_change_pw\" method=\"post\" data-parsley-validate>";
 	print "<table cellspacing=\"5\" cellpadding=\"3\">";
 	print "<tr><th>Altes Passwort:</th><th><input name=\"oldpw\" required=\"\" type=\"password\" size=\"40\"></th></tr>";
-	print "<tr><th>Neues Passwort:</th><th><input name=\"pw\" data-parsley-trigger=\"change\" data-parsley-minlength=\"8\" data-parsley-pattern=\"[ -~]+\" required=\"\" type=\"password\" size=\"40\"></th></tr>";
-	print "<tr><th>Neues Passwort wiederholen:</th><th><input name=\"pww\" data-parsley-trigger=\"change\" data-parsley-equalto=\"#pw\" required=\"\" type=\"password\" size=\"40\"></th></tr>";
+	print "<tr><th>Neues Passwort:</th><th><input id=\"pw_input\" name=\"pw\" data-parsley-trigger=\"change\" data-parsley-minlength=\"8\" data-parsley-pattern=\"[ -~]+\" required=\"\" type=\"password\" size=\"40\"></th></tr>";
+	print "<tr><th>Neues Passwort wiederholen:</th><th><input name=\"pww\" data-parsley-trigger=\"change\" data-parsley-equalto=\"#pw_input\" required=\"\" type=\"password\" size=\"40\"></th></tr>";
 	print "</table><input type=\"submit\" value=\"Passwort &auml;ndern\"></form>";
 	print "Dein neues Passwort muss mindestens aus 8 Zeichen bestehen und 3 verschiedene Zeichenklassen beinhalten.<br>Es gibt 5 Zeichenklassen:<br>";
 	print "Kleinbuchstaben, Gro&szlig;buchstaben, Sonderzeichen und Leerzeichen, Ziffern.";
