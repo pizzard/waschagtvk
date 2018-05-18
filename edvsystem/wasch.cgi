@@ -965,6 +965,12 @@ sub sperrCheck {
 
 # Login-Formular
 sub logon {
+	print "<div class=\"alert alert-warning\"><p>",
+		"Do you enjoy coding? Let’s make laundry easy for all of ",
+		"us by joining the Wasch-AG! ",
+		"<a href=\"wag\@tvk.rwth-aachen.de\">Let’s talk!</a></p>",
+		"<p><small>We’re preferably looking for someone who’d be ",
+		"available for more than a year.<small></p></div>";
 	# required note per EU directive 2009/136/EC
 	print "<p class=\"alert alert-info\">Wir verwenden cookies, damit du dich nur einmal pro Sitzung anmelden musst! <a href=\"http://cookiepedia.co.uk/all-about-cookies\" class=\"alert-link\">Lies mehr &uuml;ber Cookies</a></p>";
 	my $login = "";
