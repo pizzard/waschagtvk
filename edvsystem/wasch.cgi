@@ -140,6 +140,10 @@ if ($cgi->url_param('aktion') eq 'create_user') {
 	if (kopf("storno", $user) == 1) {
 		storno();
 	}
+} elsif ($aktion eq 'extrabonus') {
+	if (kopf("extrabonus", $user) == 1) {
+		extrabonus();
+	}
 	# Konfiguration
 } elsif ($cgi->url_param('aktion') eq 'waschmaschinen') {
 	if (kopf("waschmaschinen", $waschag) == 1) {
@@ -1594,6 +1598,9 @@ sub manage_money {
 	print "</form>";
 	print "<form action=\"$skript?aktion=storno&id=$id\" method=\"post\">";
 	normalTabellenZeile("black", "<b>Kulanz</b>", "Betrag: <input name=\"betrag\" size=\"4\">", "Grund: <input name=\"grund\" size=\"40\">", "<input type=\"submit\" value=\" best&auml;tigen\">");
+	print "</form>";
+	print "<form action=\"$skript?aktion=extrabonus&id=$id\" method=\"post\">";
+	normalTabellenZeile("black", "<b>Extrabonus</b>", "Betrag: <input name=\"betrag\" size=\"4\">", "Grund: <input name=\"grund\" size=\"40\">", "<input type=\"submit\" value=\" best&auml;tigen\">");
 	print "</form></table>";
 
 	if (($row[3] < $waschag) || ($gStatus < $admin)) {
@@ -1708,6 +1715,39 @@ sub storno {
 	}
 	geldbewegung($id, $betrag, "Kulanz von $gNname, $gName: $grund");
 	printFehler("Kulanz gew&auml;hrt!");
+}
+
+# einfach ein Bonus geben für tolle Leute!
+sub extrabonus {
+	if(sperrCheck()==1) { return; }
+	my $id = $target_user_id;
+	my $grund = encode("utf-8", $cgi->param('grund'));
+	if($grund eq "") {
+		printFehler("Kein Grund angegeben!");
+		return;
+	}
+	my $betrag = $cgi->param('betrag');
+	my $sth = $dbh->prepare("SELECT MAX(preis) from preise")|| die "Fehler bei der Datenverarbeitung! e9f267c6 $DBI::errstr\n";	# bereitet den befehl vor
+	$sth->execute();
+	my @row = $sth->fetchrow_array();
+	if(isNumeric($betrag) == 0) {
+		printFehler("Es wurde ein ung&uuml;ltiger Betrag eingegeben. Abbruch!");
+		return;
+	}
+	if($betrag > 12 && $betrag > $row[0]) {
+		printFehler("Ein Bonus groeSser als 12 wird aktuell nicht unterstuetzt. Abbruch!");
+		return;
+	}
+	if($betrag <= 0) {
+		printFehler("Ja, da w&uuml;rde sich der Nutzer aber nicht so dr&uuml;ber freuen, ne? Also: Vergiss es! :-P");
+		return;
+	}
+	if($id == $gId) {
+		printFehler("Du kannst dir aus offensichtlichen Gr&uuml;den nicht selber Extrabonus einr&auml;umen!");
+		return;
+	}
+	geldbewegung($id, 0, "Extrabonus von $gNname, $gName: $grund", $betrag);
+	printFehler("Extrabonus gew&auml;hrt!");
 }
 
 # vermerkt Transaktionen für User
